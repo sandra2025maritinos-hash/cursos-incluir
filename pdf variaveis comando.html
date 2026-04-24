@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Python - Alta Acessibilidade</title>
+    <style>
+        /* Variáveis padrão de acessibilidade */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #111827;
+            --accent-color: #2563eb;
+            --code-bg: #f1f5f9;
+            --code-text: #0f172a;
+            --base-size: 24px;
+            --spacing: 1.6;
+        }
+
+        /* Tema de Alto Contraste */
+        [data-theme="high-contrast"] {
+            --bg-color: #000000;
+            --text-color: #ffff00;
+            --accent-color: #38bdf8;
+            --code-bg: #1f2937;
+            --code-text: #ffffff;
+        }
+
+        /* Tema Escuro Suave */
+        [data-theme="dark"] {
+            --bg-color: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #60a5fa;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: var(--base-size);
+            line-height: var(--spacing);
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .controls-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #334155;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: #475569;
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #64748b;
+        }
+        
+        button:focus {
+            outline: 4px solid var(--accent-color);
+        }
+
+        .content {
+            margin: 120px auto 50px auto;
+            padding: 20px;
+            max-width: 1000px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            border-bottom: 4px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: var(--accent-color);
+            margin-top: 50px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            margin-top: 30px;
+        }
+
+        ul {
+            padding-left: 40px;
+        }
+
+        li {
+            margin-bottom: 15px;
+        }
+
+        strong {
+            font-weight: 800;
+        }
+
+        pre {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 8px solid var(--accent-color);
+            font-size: 1.1em;
+            overflow-x: auto;
+            display: block;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA DE CONTROLES DE ACESSIBILIDADE -->
+    <div class="controls-bar" role="toolbar" aria-label="Controles de acessibilidade">
+        <button onclick="changeFontSize(2)" aria-label="Aumentar tamanho do texto">A+ Aumentar Letra</button>
+        <button onclick="changeFontSize(-2)" aria-label="Diminuir tamanho do texto">A- Diminuir Letra</button>
+        <button onclick="setTheme('light')" aria-label="Tema Claro">Tema Claro</button>
+        <button onclick="setTheme('dark')" aria-label="Tema Escuro">Tema Escuro</button>
+        <button onclick="setTheme('high-contrast')" aria-label="Alto Contraste">Alto Contraste</button>
+    </div>
+
+    <!-- CONTEÚDO EXTRAÍDO DO PDF -->
+    <main class="content">
+        <h1>RPubs - Comandos básicos de Python</h1>
+        
+        <h2>Resumo do conteúdo apresentado:</h2>
+        <ul>
+            <li><strong>Variáveis</strong></li>
+            <li><strong>Tipos</strong></li>
+            <li><strong>Comandos Básicos</strong></li>
+            <li><strong>Estruturas de Controle</strong>
+                <ul>
+                    <li>Estrutura de Sequência (suite)</li>
+                    <li>Estrutura de Seleção (if, if-else, if-elif, if-elif-else)</li>
+                    <li>Estrutura de repetição (while e for)</li>
+                </ul>
+            </li>
+            <li><strong>Subprogramação:</strong>
+                <ul>
+                    <li>Funções</li>
+                    <li>Passagem de Parâmetros (Passagem por Valor, Passagem de função)</li>
+                    <li>Recursividade</li>
+                </ul>
+            </li>
+            <li><strong>Estrutura de dados:</strong>
+                <ul>
+                    <li>Vetor (split(), Matriz, append())</li>
+                    <li>String (Cadeia de Caracteres) (find())</li>
+                    <li>Tupla</li>
+                    <li>Lista (Lista de listas, Lista Lisp-Like)</li>
+                </ul>
+            </li>
+            <li><strong>Persistência dos dados:</strong>
+                <ul>
+                    <li>Arquivo texto (read(), write(), append())</li>
+                </ul>
+            </li>
+        </ul>
+
+        <hr>
+
+        <h2>Variáveis</h2>
+        
+        <h3>Tipos básicos:</h3>
+        <ul>
+            <li><strong>Tipos Integrais:</strong>
+                <ul>
+                    <li><strong>Inteiro: (int)</strong> Pode ter centenas de dígitos. O padrão é decimal, mas pode usar bases como binária (iniciada com 0b), octal (iniciada com 0o) ou hexadecimal (iniciada com 0x).</li>
+                    <li><strong>Lógico (ou Booleano): (bool)</strong> 0 é False e 1 é True.</li>
+                </ul>
+            </li>
+            <li><strong>Tipos de Ponto-Flutuante:</strong>
+                <ul>
+                    <li><strong>Número de ponto-flutuante: (float)</strong></li>
+                    <li><strong>Número Complexo: (complex)</strong></li>
+                </ul>
+            </li>
+            <li><strong>String (str):</strong>
+                <ul>
+                    <li>Representada por uma sequência de caracteres Unicode, iniciada e terminada por aspas simples ou duplas.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Tipos</h2>
+        <h3>Conversão de Tipos:</h3>
+        <ul>
+            <li><code>int</code>: para inteiro</li>
+            <li><code>float</code>: para ponto flutuante</li>
+            <li><code>bool</code>: para booleano</li>
+            <li><code>str</code>: para string</li>
+        </ul>
+
+        <h3>Operadores únicos:</h3>
+        <ul>
+            <li><code>+</code> : Operador numérico positivo</li>
+            <li><code>-</code> : Operador numérico negativo</li>
+            <li><code>not</code> : Operador lógico de negação</li>
+        </ul>
+
+        <h3>Operadores Binários Aritméticos:</h3>
+        <ul>
+            <li><code>+</code> : Soma</li>
+            <li><code>-</code> : Subtração</li>
+            <li><code>*</code> : Produto</li>
+            <li><code>/</code> : Divisão de ponto flutuante</li>
+            <li><code>//</code> : Divisão inteira</li>
+            <li><code>%</code> : Resto da divisão inteira</li>
+            <li><code>**</code> : Potencialização</li>
+        </ul>
+
+        <h3>Operadores Binários Lógicos:</h3>
+        <ul>
+            <li><code>or</code> : Disjunção lógica ou soma lógica</li>
+            <li><code>and</code> : Conjunção lógica ou produto lógico</li>
+        </ul>
+
+        <h3>Operadores Binários Relacionais:</h3>
+        <ul>
+            <li><code>==</code> : Igual a</li>
+            <li><code>!=</code> : Diferente de</li>
+            <li><code>&gt;</code> : Maior que</li>
+            <li><code>&lt;</code> : Menor que</li>
+            <li><code>&gt;=</code> : Maior ou igual</li>
+            <li><code>&lt;=</code> : Menor ou igual</li>
+        </ul>
+
+        <hr>
+
+        <h2>Comandos básicos</h2>
+        
+        <h3>Comandos de saída padrão:</h3>
+        <ul>
+            <li><code>print()</code>: Pula para a próxima linha</li>
+            <li><code>print(expressão)</code>: Escreve o resultado da expressão e pula para a próxima linha</li>
+            <li><code>print(expressão1, ..., expressãoN)</code>: Escreve o resultado de cada expressão. Espaço em branco é escrito entre cada par de expressão. Pula para a próxima linha.</li>
+            <li><code>print(expressão, end=término)</code>: Escreve o resultado da expressão. Ao final, escreve o String de término.</li>
+            <li><code>print(expressão1, ..., expressãoN, end=término)</code>: Escreve o resultado de cada expressão. Espaço em branco é escrito entre cada par de expressão. Ao final, escreve o String de término.</li>
+        </ul>
+
+        <h3>Expressões Formatadas (operador %(...))</h3>
+        <p>Sintaxe da expressão formatada:</p>
+        <pre>texto = "...%formato1... %formatoN..."%(exp1, ..., expN)</pre>
+        <p>Formatos mais comuns: %d (inteiro), %f (número com ponto flutuante) e %s (String)</p>
+        <p>Exemplos:</p>
+        <pre>msg=" A media dos numeros é %4.2f" %(8656656.6164134)
+print(msg)
+
+print("%f + %f = %4.1f" %(15, 9.578421, 15+9.578421))
+
+print("%d %d %d" %(5, 7.578421, 5+7.578421), end="!!!")</pre>
+
+        <h3>Comandos de entrada padrão:</h3>
+        <ul>
+            <li><code>input()</code>: Comando que aguarda o usuário fornecer um valor expresso por uma sequencia de caracteres. Este comando suspende a execução do programa até que o usuário escreva sua entrada e pressione enter.</li>
+            <li><code>input(mensagem)</code>: Comando que escreve a expressão mensagem e aguarda o usuário fornecer um valor expresso por uma sequencia de caracteres. Este comando suspende a execução do programa até que o usuário escreva sua entrada e pressione enter.</li>
+        </ul>
+
+        <hr>
+
+        <h2>Estrutura de Controle</h2>
+        
+        <h3>Sequência (Suite)</h3>
+        <p>Em Python, ao construir uma sequência de comandos, devemos colocá-los um por linha abaixo do outro, mantendo-os na mesma tabulação.</p>
+        <p>Um bloco de comando que possui um ou mais comandos é chamado de suite.</p>
+
+        <h3>Comentários</h3>
+        <ul>
+            <li>Comentários simples: iniciados com o caractere <code>#</code></li>
+            <li>Comentários com múltiplas linhas: delimitados por <code>"""</code> ou <code>'''</code></li>
+        </ul>
+
+        <h2>Estruturas de seleção</h2>
+        
+        <h3>Estrutura de seleção de 1 ramo (if)</h3>
+        <p>Uma estrutura de seleção com um ramo if é utilizada quando se deseja executar um comando (ou uma suite) apenas no caso de determinada condição ser satisfeita.</p>
+        <p>Exemplo do uso:</p>
+        <pre>dinheiro = 50000
+if dinheiro>10000:
+    imps = dinheiro * 0.1
+    multa = dinheiro * 0.15
+    print("Valor do Imposto:", imps, "e da multa:", multa)</pre>
+        <p>Para condições compostas pode ser feita a condição utilizando: and, or. Exemplo: <code>10<=x<=20</code></p>
+
+        <h3>Estrutura de seleção de 2 ramos (if-else)</h3>
+        <p>A estrutura de dois ramos if-else é utilizada quando deseja-se executar uma entre duas suites, dependendo de como foi avaliada a condição (como True ou False).</p>
+        <p>Exemplo de uso:</p>
+        <pre>x = 10
+if x>0:
+    print(x, "é maior do que zero.")
+else:
+    print(x, "é menor ou igual a zero.")</pre>
+
+        <h3>Estrutura de Seleção Aninhadas</h3>
+        <p>Veja o exemplo a seguir: Calcula ajuste de dinheiro, se tempo < 1 mantém, se tempo < 10 faz uma coisa, se tempo > 10 faz outra:</p>
+        <pre>dinheiro = 1000.50
+tempo = 20
+if tempo<1:
+    print("Seu dinheiro continua:", dinheiro)
+else:
+    if tempo<10:
+        dinheiro = dinheiro * 1.1
+    else:
+        dinheiro = dinheiro * 1.2
+print("Seu dinheiro apos o ajuste:", dinheiro)</pre>
+
+        <h3>Estrutura de Seleção com Múltiplos Ramos (if-elif ou if-elif-else)</h3>
+        <p>As estruturas de seleção if-elif e if-elif-else têm uso quando deseja-se executar uma entre várias suites, dependendo do resultado da condição avaliada.</p>
+        <p>Veja o exemplo a seguir com uso do if-elif:</p>
+        <pre># Faremos um comando que funciona como calculadora.
+valores = [5, 9] # Poderiamos pedir que o usuario informasse com valores = input("Digite dois valores: ").split()
+
+x = int(valores[0])
+y = int(valores[1])
+op = "+"
+
+if op=="+":
+    resultado = x+y
+elif op=="-":
+    resultado = x-y
+elif op=="*":
+    resultado = x*y
+elif op=="/":
+    resultado = x/y
+elif op=="**":
+    resultado = x**y
+
+print(x, op, y, "=", resultado)</pre>
+
+        <p>Veja o exemplo a seguir com uso do if-elif-else:</p>
+        <pre>valores = [5, 9] 
+x = int(valores[0])
+y = int(valores[1])
+op = "+"
+
+if op=="+":
+    resultado = x+y
+elif op=="-":
+    resultado = x-y
+elif op=="*":
+    resultado = x*y
+elif op=="/":
+    resultado = x/y
+elif op=="**":
+    resultado = x**y
+else:
+    resultado = None
+
+if resultado==None:
+    print(op, "Operador inexistente!!")
+else:
+    print(x, op, y, "=", resultado)</pre>
+
+        <hr>
+
+        <h2>Estruturas de Repetição</h2>
+
+        <h3>Estruturas de Repetição Indefinida (while):</h3>
+        <p>A estrutura de repetição indefinida while deve ser utilizada quando se deseja executar zero ou mais vezes uma suite enquanto a condição estipulada for verdadeira.</p>
+        <pre>i = 1
+while i <= 10:
+    print(i, end="")
+    i = i + 1
+print()</pre>
+
+        <h3>Estruturas de Repetição Definida (for):</h3>
+        <p>A estrutura de repetição definida 'for' deve ser utilizada quando se deseja, um determinado número de vezes, executar uma mesma suite, enumerado ou não por uma lista de valores.</p>
+        <pre>for i in [2,3,4,5,6,7,8,9]:
+    print(i, end="")
+print()</pre>
+
+        <h3>Listas de Valores para uma Repetição for</h3>
+        <p>Para criar uma lista para repetições for:</p>
+        <ul>
+            <li><code>range(valor limite)</code>: Cria uma lista com P.A. de itens de razão 1, iniciada pelo valor 0 e termina no valor que antecede o limite. Exemplo: <code>print(range(7))</code></li>
+            <li><code>range(valor inicial, valor limite)</code>: Cria uma lista com P.A. de itens de razão 1, iniciada pelo valor inicial e termina no valor que antecede o limite. Exemplo: <code>print(range(7,20))</code></li>
+            <li><code>range(valor inicial, valor limite, avanço)</code>: Cria uma lista com P.A. de itens de razão avanço, iniciada pelo valor inicial e termina no valor que antecede o limite. Exemplo: <code>print(range(9,50,3))</code></li>
+        </ul>
+
+        <hr>
+
+        <h2>Subprogramação</h2>
+
+        <h3>Funções</h3>
+        <p>São suites, comandos e/ou estruturas de controle, ao qual atribuímos um nome e após a sua execução obtemos um valor.</p>
+        <p>A utilização de funções permite que o programa possa ser desenvolvido e testado separadamente, além de permitir a reutilização de algumas partes em diferentes pontos do programa.</p>
+        
+        <p>Declaração de uma função em Python:</p>
+        <pre>def nomeEscolhido(lista de parametros):
+    # suite do corpo da funcao</pre>
+        <p>Onde: a lista de parâmetros pode ter zero ou mais parâmetros separados por vírgulas. A suite do corpo da função deve possuir zero ou mais retornos de valores, expressos por <code>return valor apropriado</code> (caso nenhum valor seja retornado, <code>return None</code>).</p>
+
+        <h3>Passagem de Parâmetros</h3>
+        <p>Caso uma função possa ser aplicada a diferentes valores de entrada, esta função deve conter parâmetros em sua definição.</p>
+        <ul>
+            <li><strong>Passagem de parâmetro por valor:</strong> No início da função, os parâmetros sempre são inicializados com a cópia dos ponteiros (referências) para os valores implementados na ativação da função. Valores de tipo básico são imutáveis. Valores de tipos estruturados são mutáveis. Os valores podem vir de Constantes, Variáveis ou Resultados de funções.</li>
+            <li><strong>Passagem por função:</strong> Da mesma maneira que por valor, a função pode receber ou retornar outra função definida previamente.</li>
+        </ul>
+
+        <h3>Recursividade</h3>
+        <p>Chama-se de função recursiva quando a função possui no seu corpo uma chamada a ela própria. Exemplo no cálculo de fatorial:</p>
+        <pre>def fat(n):
+    if n==0:
+        return 1
+    else:
+        return n * fat(n-1) # Aqui esta a chamada recursiva</pre>
+
+        <hr>
+
+        <h2>Estrutura de Dados</h2>
+
+        <h3>Vetor</h3>
+        <p>Um vetor é um agregado de elementos (também chamados de valores) de um mesmo tipo. Imagine um vetor, do qual para a seleção de elementos dentro desse vetor, podemos utilizar um índice ou seletor do elemento que indica sua posição ou ordem.</p>
+        <pre>vetor = [4,3,2,1]
+print(vetor[0])
+print(vetor[3])</pre>
+
+        <p>Características:</p>
+        <ul>
+            <li>É uma estrutura homogênea</li>
+            <li>Todos os elementos da estrutura são igualmente acessíveis</li>
+            <li>Cada elemento da estrutura tem um nome próprio</li>
+            <li>Um vetor pode ser simples ou estruturado</li>
+        </ul>
+
+        <p>Acesso a elementos do vetor? Suponha que se queira somar todos os elementos do vetor:</p>
+        <pre># Utilizando o range()
+soma = 0
+for i in range(3):
+    soma = soma + vetor[i]
+
+# Utilizando o len()
+soma = 0
+for i in range(len(itens)):
+    soma = soma + itens[i]</pre>
+
+        <p>A leitura de um vetor pode ser realizada elemento a elemento ou todas as informações podem ser lidas de uma vez, sobre o qual se aplica a operação split para separá-las.</p>
+        <pre># Leitura de todos os valores de uma vez:
+valores = input("Digite os valores na mesma linha: ").split()
+
+# Leitura um de cada vez:
+valores = [None]*10
+for i in range(len(valores)):
+    valores[i] = input("Digite um valor: ")</pre>
+
+        <p>A escrita de um vetor pode ser realizada toda de uma vez ou elemento a elemento:</p>
+        <pre># Todos de uma vez
+numeros = [4,6,2,5,1,25,12,32]
+print(numeros)
+
+# Escrita um de cada vez:
+numeros = [4,6,2,5,1,25,12,32]
+for x in numeros:
+    print(x, end="")
+print() # Para pular uma linha</pre>
+
+        <h3>Matriz</h3>
+        <p>A matriz 2D é um vetor de vetores, vejamos um exemplo:</p>
+        <pre>aposta = [[" "," "," "],
+          [" "," "," "],
+          [" "," "," "],
+          ["x"," "," "],
+          [" "," "," "],
+          [" "," "," "],
+          [" ","x"," "]]
+print(aposta)</pre>
+        <p>Para acessar os elementos desse vetor: <code>aposta[0]</code> representa a primeira linha. <code>aposta[0][0]</code> representa o caractere da primeira linha da primeira coluna.</p>
+
+        <p><strong>Entrada dinâmica de Vetores e Matrizes:</strong> Em python, vetores e matrizes são implementados por listas, uma forma alternativa é utilizando a operação que anexa um valor ao final de uma lista: <code>append()</code>.</p>
+
+        <h3>String (Cadeia de Caracteres)</h3>
+        <p>Um objeto do tipo str representa uma cadeia de caracteres, de tamanho e valor imutáveis. Veja um exemplo:</p>
+        <pre>nome = "Ana"
+print(len(nome)) # confima o comprimento ou quantidade de caracteres</pre>
+
+        <p><strong>Comparação e Indexação:</strong> O tipo de String pode ser tratado também como vetor. Exemplo: <code>nome[0]</code>. O operador <code>+</code>, quando aplicado a dois Strings a e b retorna uma String concatenada.</p>
+
+        <p><strong>Fatiamento:</strong> <code>nomeString[posicao_inicial : posicao_final+1]</code></p>
+        
+        <p><strong>Método find(subStringProcurada):</strong> Retorna a posição do indice da primeira ocorrência da subString procurada. Caso não seja encontrada, retorna menos um (-1).</p>
+        
+        <p>Outros métodos importantes:</p>
+        <ul>
+            <li><code>replace(subStringProcurada, subStringNova)</code>: Retorna uma cópia da string substituindo.</li>
+            <li><code>count(subStringProcurada)</code>: Retorna a quantidade de ocorrências.</li>
+            <li><code>upper()</code> e <code>lower()</code>: Converte tudo para maiúsculo ou minúsculo.</li>
+            <li><code>strip()</code>: Remove caracteres brancos do início e do final.</li>
+            <li><code>split()</code> ou <code>split(subStringSeparadora)</code>: Retorna uma lista de todas as palavras String.</li>
+        </ul>
+
+        <h3>Tupla</h3>
+        <p>Uma sequência ordenada de zero ou mais referências a objetos. Tuplas suportam o mesmo fatiamento, acesso por iteradores e desempacotamento que Vetores e Strings. São imutáveis e podem ser vazias.</p>
+        <pre>vazio = tuple()
+val = ("abacaxi", 500, 4.99)
+# ou ainda:
+val = "abacaxi", 500, 4.99</pre>
+        <p>Vetores e strings podem ser empacotados como tuplas através da função <code>tuple()</code>.</p>
+
+        <p><strong>Desempacotamento e iteração:</strong></p>
+        <pre>individuo, altura = ("Maria Jose", 1.39)
+# ou ainda:
+(nome, idade) = ("Maria Jose", 1.39)
+
+# Iterando sobre itens:
+tomDePele = ("Marrom", "Amarelo", "Azul", "Branco")
+for cor in tomDePele:
+    print(cor)</pre>
+
+        <p><strong>Métodos sobre Tuplas:</strong></p>
+        <ul>
+            <li><code>count(valor)</code>: Retorna a quantidade de ocorrências.</li>
+            <li><code>index(valor)</code>: Retorna o índice da primeira ocorrência do valor.</li>
+        </ul>
+        <p><strong>Operadores sobre Tuplas:</strong> concatenação (<code>a+b</code>), replicação (<code>a*n</code>), fatiamento, atribuição incremental, comparação, associação (<code>in</code> e <code>not in</code>).</p>
+
+        <h3>Listas</h3>
+        <p>Uma lista é uma sequencia ordenada pelo índice. Características: Estrutura de dado recursiva. Representada por uma sequência fechada por colchetes <code>[ ]</code>. Listas são mutáveis.</p>
+        <pre># Declarando uma lista:
+salada = []
+# Incluindo valores:
+salada = ["maca", "pera", "uva"]</pre>
+
+        <p><strong>Operações de inclusão:</strong></p>
+        <ul>
+            <li><code>append(novoElemento)</code>: anexa um novo elemento no final da lista.</li>
+            <li><code>insert(pos, novoElemento)</code>: insere o novo elemento na posição pos.</li>
+        </ul>
+
+        <p>Criando uma lista de números aleatórios:</p>
+        <pre>def preencher(listaElems, qtd, min, max):
+    from random import randint
+    for item in range(qtd):
+        listaElems.append(randint(min, max))
+    return None</pre>
+
+        <p><strong>Operações de exclusão:</strong></p>
+        <ul>
+            <li><code>pop()</code>: retorna e remove o último elemento.</li>
+            <li><code>pop(pos)</code>: retorna e remove o elemento na posição pos.</li>
+            <li><code>remove(x)</code>: remove a primeira ocorrência do item x.</li>
+        </ul>
+
+        <p><strong>Outras operações com listas:</strong> <code>len()</code>, <code>lista.count(elemento)</code>, <code>lista.sort()</code>.</p>
+
+        <p><strong>Fatiamento de Listas:</strong></p>
+        <pre>saladaComposta = ["banana", "caju", "uva", "pera", "manga", "kiwi"]
+saladaSimples = saladaComposta[1:4]
+print(saladaSimples) # Imprime: ['caju', 'uva', 'pera']</pre>
+
+        <h3>Listas de listas</h3>
+        <p>Os índices fazem referências a novas listas contidas no seu interior:</p>
+        <pre>mercado = [["pera", 100, 4.9], ["manga", 20, 3.9], ["uva", 30, 5.9], ["caju", 15.35]]
+mercado[1][2] = mercado[1][2] * 0.5 # Manga pela metade do preço
+mercado.remove(["uva", 30, 5.9]) # O produto uva é removido</pre>
+
+        <h3>Lista (Lisp-Like)</h3>
+        <p>Três operações primitivas do paradigma de programação funcional (Lisp):</p>
+        <ul>
+            <li><code>car(dados)</code>: retorna o primeiro elemento.</li>
+            <li><code>cdr(dados)</code>: retorna todos os elementos exceto o primeiro.</li>
+            <li><code>cons(item, dados)</code>: retorna uma lista com o item como primeiro elemento seguido pelos dados.</li>
+        </ul>
+        <pre>def car(dados): return dados[0]
+def cdr(dados): return dados[1:len(dados)]
+def cons(item, dados): return [item] + dados
+
+def soma(dados):
+    if dados==[]: return 0
+    else: return car(dados) + soma(cdr(dados))</pre>
+
+        <hr>
+
+        <h2>Persistência dos dados</h2>
+        <h3>Arquivos texto</h3>
+        <p>Em python, a leitura de arquivos é feito da seguinte maneira:</p>
+        <pre># r: Leitura; w: apenas escrita; a: escreve no final do arquivo
+dados = open("caminho_do_arquivo", "r")
+# comandos...
+dados.close()</pre>
+
+        <p><strong>Método readline():</strong> Retorna uma linha completa. O leitor avança para a próxima linha.</p>
+        <pre>dados_abrir = input("Digite o nome do arquivo que deseja visualizar: ")
+dados = open(dados_abrir, "r")
+linha = dados.readline()
+while linha != "":
+    print(linha, end="")
+    linha = dados.readline()
+dados.close()
+
+# Outra maneira (usando for):
+for linha in dados:
+    print(linha, end="")</pre>
+
+        <p><strong>Comando readlines():</strong> Funciona apenas para pequenos arquivos, transforma tudo numa lista de linhas.</p>
+        <pre>linhas = dados.readlines()
+for linha in linhas:
+    print(linha, end="")</pre>
+
+        <p><strong>Produzindo um arquivo de texto com write():</strong></p>
+        <pre>dados = open("teste.txt", "w")
+dados.write("qualquercoisa\n")
+dados.close()</pre>
+
+        <p><strong>Anexando uma nova linha no final de um arquivo:</strong></p>
+        <pre>nome = input("Diga o nome do arquivo que deseja anexar")
+arquivo = open(nome, "a")
+nova_linha = input("Diga a nova linha:")
+arquivo.write(nova_linha + "\n")
+arquivo.close()</pre>
+
+    </main>
+
+    <script>
+        // Lógica de Acessibilidade
+        let currentFontSize = 24; 
+
+        function changeFontSize(change) {
+            currentFontSize += change;
+            
+            if (currentFontSize < 16) currentFontSize = 16;
+            if (currentFontSize > 60) currentFontSize = 60;
+            
+            document.documentElement.style.setProperty('--base-size', currentFontSize + 'px');
+        }
+
+        function setTheme(themeName) {
+            document.body.setAttribute('data-theme', themeName);
+        }
+        
+        setTheme('dark');
+    </script>
+</body>
+</html>

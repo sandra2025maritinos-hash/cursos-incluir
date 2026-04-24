@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Mental Neon - LIBRAS</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background-color: #0b0f19;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            color: white;
+        }
+
+        #map-container {
+            width: 100vw;
+            height: 100vh;
+            cursor: grab;
+        }
+        #map-container:active {
+            cursor: grabbing;
+        }
+
+        /* Estilo das Linhas */
+        .link {
+            fill: none;
+            stroke-width: 2.5px;
+            opacity: 0.6;
+            transition: stroke-width 0.3s;
+        }
+        .link.left { stroke: #10b981; } /* Verde Neon */
+        .link.right { stroke: #a855f7; } /* Roxo Neon */
+        .link.center { stroke: #10b981; }
+
+        /* Estilo dos Nós (Bolinhas) */
+        .node circle {
+            fill: #0b0f19;
+            stroke-width: 2.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .node.center circle {
+            stroke: #10b981;
+            stroke-width: 4px;
+            filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.9));
+        }
+
+        .node.left circle {
+            stroke: #10b981;
+            filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+        }
+        .node.left:hover circle {
+            stroke-width: 5px;
+            fill: rgba(16, 185, 129, 0.1);
+        }
+
+        .node.right circle {
+            stroke: #a855f7;
+            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
+        }
+        .node.right:hover circle {
+            stroke-width: 5px;
+            fill: rgba(168, 85, 247, 0.1);
+        }
+
+        /* Textos do Mapa */
+        .node text {
+            font-size: 10px;
+            font-weight: 700;
+            fill: #e2e8f0;
+            text-anchor: middle;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Painel Lateral */
+        #side-panel {
+            position: fixed;
+            right: -550px;
+            top: 0;
+            width: 550px;
+            max-width: 100vw;
+            height: 100vh;
+            background: rgba(11, 15, 25, 0.95);
+            backdrop-filter: blur(16px);
+            border-left: 2px solid rgba(255,255,255,0.1);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        }
+        #side-panel.open {
+            right: 0;
+        }
+        
+        #panel-header {
+            padding: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        #panel-content {
+            padding: 2rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            color: #cbd5e1;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .zoom-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 40;
+        }
+        .zoom-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+        }
+        .zoom-btn:hover {
+            background: #10b981;
+            border-color: #10b981;
+            transform: scale(1.1);
+        }
+        
+        #panel-content::-webkit-scrollbar { width: 6px; }
+        #panel-content::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+
+        /* Estilos do Quiz gerado por IA */
+        .quiz-option {
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .quiz-option:hover:not(:disabled) {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+        }
+        .quiz-option.correct {
+            background-color: rgba(16, 185, 129, 0.3);
+            border-color: #10b981;
+            color: #34d399;
+        }
+        .quiz-option.incorrect {
+            background-color: rgba(239, 68, 68, 0.3);
+            border-color: #ef4444;
+            color: #f87171;
+        }
+
+        /* Novo Estilo para o Avatar Flutuante */
+        @keyframes floatAvatar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map-container"></div>
+
+    <!-- Botão de Introdução -->
+    <button onclick="openIntro()" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-40 bg-emerald-900/80 hover:bg-emerald-800 border-2 border-emerald-500 text-emerald-100 font-black tracking-widest py-3 px-8 rounded-full transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)] hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] flex items-center gap-3 cursor-pointer">
+        <i class="fa-solid fa-play-circle text-xl"></i> INTRODUÇÃO
+    </button>
+
+    <!-- Controles de Zoom -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomIn()" title="Aumentar Zoom"><i class="fa-solid fa-plus"></i></button>
+        <button class="zoom-btn" onclick="zoomOut()" title="Diminuir Zoom"><i class="fa-solid fa-minus"></i></button>
+        <button class="zoom-btn" onclick="resetZoom()" title="Centralizar"><i class="fa-solid fa-crosshairs"></i></button>
+    </div>
+
+    <!-- Painel Deslizante -->
+    <div id="side-panel">
+        <button onclick="closePanel()" class="absolute top-4 right-6 text-gray-400 hover:text-white text-2xl z-50">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- Avatar Flutuante Fora da Caixa -->
+        <div id="floating-avatar-container" class="absolute hidden transition-all duration-500 -left-[120px] md:-left-[180px] bottom-[30px] md:bottom-[50px] z-50 cursor-grab active:cursor-grabbing">
+            
+            <!-- UM ÚNICO ELEMENTO QUE MUDA DE IMAGEM SOZINHO PELO JAVASCRIPT -->
+            <img id="floating-avatar-element" class="w-[120px] h-[120px] md:w-[160px] md:h-[160px] rounded-full object-cover pointer-events-none border-[4px] border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.6)] bg-slate-900" style="animation: floatAvatar 4s ease-in-out infinite;" src="" alt="Professora" onerror="if(this.src.indexOf('mao_nacintura') !== -1) { this.onerror = null; this.src = 'WhatsApp Image 2026-04-20 at 08.45.38 (3).jpeg'; }">
+
+        </div>
+        
+        <div id="panel-header" class="shrink-0">
+            <h4 id="panel-subtitle" class="text-xs font-bold uppercase tracking-widest mb-2"></h4>
+            <h2 id="panel-title" class="text-3xl font-black text-white"></h2>
+        </div>
+        
+        <div id="panel-content" class="flex flex-col">
+            <div id="panel-desc-container" class="bg-white/5 border-l-4 p-5 rounded-2xl mb-6 font-medium text-lg shadow-sm">
+                <span id="panel-desc-top" class="text-white"></span>
+            </div>
+            
+            <!-- Área Mídia Dinâmica -->
+            <div id="panel-media-container" class="mb-6 w-full flex flex-col gap-4 justify-center hidden relative">
+                <audio id="panel-audio" controls class="w-full hidden rounded-full shadow-lg border border-white/20"></audio>
+                <video id="panel-video" controls playsinline class="w-full max-h-64 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.5)] border-2 border-white/10 hidden bg-black object-cover"></video>
+            </div>
+
+            <!-- Caixa de Conclusão / Detalhes -->
+            <div class="bg-white/5 p-5 rounded-2xl border border-white/10 shadow-sm mb-6">
+                <h4 class="font-black text-gray-400 uppercase text-xs mb-3 flex items-center gap-2 tracking-widest border-b border-white/10 pb-2">
+                    <i class="fa-solid fa-lightbulb text-yellow-400 text-lg"></i> Aprofundamento
+                </h4>
+                <p id="panel-desc-bottom" class="text-slate-300 text-[1rem] leading-relaxed"></p>
+            </div>
+
+            <!-- Bloco de Notas / Pesquisa Google -->
+            <div id="panel-notes-container" class="hidden bg-slate-800/80 p-5 rounded-2xl border border-blue-400/50 shadow-md mb-6">
+                <h4 class="font-black text-blue-400 uppercase text-xs mb-3 flex items-center gap-2 tracking-widest border-b border-white/10 pb-2">
+                    <i class="fa-brands fa-google text-blue-400 text-lg"></i> Pesquisa Google
+                </h4>
+                <div id="panel-notes-text" class="text-slate-200 text-sm leading-relaxed"></div>
+            </div>
+
+            <!-- INTEGRAÇÃO GEMINI IA -->
+            <div class="flex flex-col gap-3 mt-auto">
+                <h4 class="font-black text-gray-400 uppercase text-xs tracking-widest border-b border-white/10 pb-2 mb-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-purple-400 text-lg"></i> Funcionalidades de IA
+                </h4>
+                
+                <!-- Botões de IA -->
+                <div class="flex gap-2">
+                    <button onclick="toggleAIChat()" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-bold py-3 px-3 rounded-xl transition-all shadow-sm flex justify-center items-center gap-2 text-sm">
+                        <i class="fa-solid fa-robot"></i> Chat c/ Profª Sandra ✨
+                    </button>
+                    <button onclick="generateAIQuiz()" id="btn-quiz" class="flex-1 bg-purple-900/50 hover:bg-purple-800/80 border border-purple-500/50 text-purple-200 font-bold py-3 px-3 rounded-xl transition-all shadow-sm flex justify-center items-center gap-2 text-sm">
+                        <i class="fa-solid fa-clipboard-question"></i> Gerar Quiz ✨
+                    </button>
+                </div>
+
+                <!-- Chat da IA -->
+                <div id="ai-chat-section" class="hidden mt-2 border border-emerald-500/30 bg-black/40 rounded-2xl p-4 shadow-inner">
+                    <h4 class="font-black text-emerald-400 uppercase text-xs mb-3 flex items-center gap-2 tracking-widest">
+                        <i class="fa-solid fa-sparkles text-emerald-400"></i> Profª Sandra (IA)
+                    </h4>
+                    <textarea id="ai-input" rows="2" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Faça uma pergunta sobre o tema atual..."></textarea>
+                    <button onclick="askAI()" id="btn-ask-ai" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl transition-all shadow-md">
+                        Perguntar ✨
+                    </button>
+                    <div id="ai-response" class="mt-4 p-4 bg-emerald-900/20 border border-emerald-500/20 rounded-xl text-sm text-emerald-50 hidden leading-relaxed"></div>
+                </div>
+
+                <!-- Secção do Quiz IA -->
+                <div id="ai-quiz-section" class="hidden mt-2 border border-purple-500/30 bg-black/40 rounded-2xl p-4 shadow-inner">
+                    <h4 class="font-black text-purple-400 uppercase text-xs mb-3 flex items-center gap-2 tracking-widest">
+                        <i class="fa-solid fa-star text-purple-400"></i> Desafio de Conhecimento
+                    </h4>
+                    <div id="quiz-content" class="text-sm text-slate-200 flex flex-col gap-4">
+                        <!-- O quiz renderizado aparecerá aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles de Paginação -->
+            <div id="panel-pagination" class="flex justify-between items-center mt-6 hidden border-t border-white/10 pt-6">
+                <button id="btn-prev" onclick="mudarPagina(-1)" class="bg-slate-800 text-white px-4 py-3 rounded-xl font-bold hover:bg-slate-700 transition-colors flex items-center shadow-sm border border-slate-600">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Anterior
+                </button>
+                <span id="page-indicator" class="text-sm font-bold text-gray-400 tracking-widest">1 / 2</span>
+                <button id="btn-next" onclick="mudarPagina(1)" class="bg-slate-800 text-white px-4 py-3 rounded-xl font-bold hover:bg-slate-700 transition-colors flex items-center shadow-md border border-slate-600">
+                    Próxima <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CÓDIGO JAVASCRIPT -->
+    <script>
+        const apiKey = ""; 
+
+        // -------------------------------------------------------------
+        // FUNCIONALIDADES IA: CHAT & QUIZ
+        // -------------------------------------------------------------
+        function toggleAIChat() {
+            const chatSec = document.getElementById('ai-chat-section');
+            const quizSec = document.getElementById('ai-quiz-section');
+            chatSec.classList.toggle('hidden');
+            if (!chatSec.classList.contains('hidden')) quizSec.classList.add('hidden');
+        }
+
+        async function fetchWithRetry(url, options, retries = 5) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
+                }
+            }
+        }
+
+        async function askAI() {
+            const inputEl = document.getElementById('ai-input');
+            const input = inputEl.value.trim();
+            if (!input) return;
+
+            const btn = document.getElementById('btn-ask-ai');
+            const responseDiv = document.getElementById('ai-response');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> A pensar...';
+            responseDiv.classList.remove('hidden');
+            responseDiv.innerHTML = '<div class="flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-circle-notch fa-spin"></i> A preparar resposta pedagógica...</div>';
+
+            let contextTitle = currentModalDados ? currentModalDados.name.replace(/\n/g, ' ') : "Libras e Inclusão";
+            let contextDesc = currentModalDados ? currentModalDados.description || currentModalDados.paginas?.[0]?.explicacao_top : "";
+
+            const systemPrompt = `Você é a Professora Sandra, especialista em LIBRAS, Educação Inclusiva e Sustentabilidade Social. Responda em Português (Portugal) de forma didática e acolhedora. O aluno está atualmente no tópico "${contextTitle}". (Contexto: "${contextDesc}"). Tente relacionar sua resposta a este contexto. Se o aluno pedir para traduzir, mostre a estrutura em GLOSA (MAIÚSCULAS).`;
+
+            const payload = {
+                contents: [{ parts: [{ text: input }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            try {
+                const data = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (textResponse) {
+                    responseDiv.innerHTML = `<div class="prose prose-invert prose-emerald text-sm max-w-none">${textResponse.replace(/\n/g, '<br>')}</div>`;
+                    inputEl.value = ""; 
+                }
+            } catch (error) {
+                responseDiv.innerHTML = '<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation"></i> Tivemos um problema de comunicação com a IA. Tente de novo.</span>';
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = 'Perguntar ✨';
+        }
+
+        let currentQuizData = null;
+
+        async function generateAIQuiz() {
+            const quizSec = document.getElementById('ai-quiz-section');
+            const chatSec = document.getElementById('ai-chat-section');
+            const quizContent = document.getElementById('quiz-content');
+            const btnQuiz = document.getElementById('btn-quiz');
+
+            chatSec.classList.add('hidden');
+            quizSec.classList.remove('hidden');
+
+            btnQuiz.disabled = true;
+            btnQuiz.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A gerar...';
+            quizContent.innerHTML = '<div class="flex items-center gap-2 text-purple-400 py-4"><i class="fa-solid fa-circle-notch fa-spin"></i> A analisar o tópico e a criar o desafio...</div>';
+
+            let contextTitle = currentModalDados ? currentModalDados.name.replace(/\n/g, ' ') : "Libras";
+            let contextDesc = currentModalDados ? currentModalDados.description || currentModalDados.paginas?.[0]?.explicacao_top : "";
+
+            const prompt = `Gere uma pergunta de escolha múltipla (com 3 opções) em Português de Portugal sobre o tópico de LIBRAS: "${contextTitle}". Use o contexto: "${contextDesc}". Retorne APENAS um JSON válido seguindo a estrutura pedida.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            question: { type: "STRING", description: "A pergunta principal" },
+                            options: { type: "ARRAY", items: { type: "STRING" }, description: "3 opções de resposta" },
+                            correctIndex: { type: "INTEGER", description: "O índice da resposta correta (0, 1 ou 2)" },
+                            explanation: { type: "STRING", description: "Explicação didática do porquê ser essa a resposta certa." }
+                        },
+                        required: ["question", "options", "correctIndex", "explanation"]
+                    }
+                }
+            };
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            try {
+                const data = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const jsonStr = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (jsonStr) {
+                    currentQuizData = JSON.parse(jsonStr);
+                    renderQuiz();
+                }
+            } catch (error) {
+                quizContent.innerHTML = '<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation"></i> Falha ao gerar quiz. Tente novamente.</span>';
+            }
+
+            btnQuiz.disabled = false;
+            btnQuiz.innerHTML = '<i class="fa-solid fa-clipboard-question"></i> Novo Quiz ✨';
+        }
+
+        function renderQuiz() {
+            const quizContent = document.getElementById('quiz-content');
+            if (!currentQuizData) return;
+
+            let html = `<p class="font-bold text-white text-base mb-2">${currentQuizData.question}</p><div class="flex flex-col gap-2">`;
+            
+            currentQuizData.options.forEach((opt, idx) => {
+                html += `<button onclick="answerQuiz(${idx})" id="opt-${idx}" class="quiz-option text-left p-3 rounded-lg bg-black/50 hover:bg-white/5 w-full">${opt}</button>`;
+            });
+            
+            html += `</div><div id="quiz-feedback" class="mt-4 hidden p-3 rounded-lg border"></div>`;
+            quizContent.innerHTML = html;
+        }
+
+        function answerQuiz(selectedIndex) {
+            if (!currentQuizData) return;
+
+            const isCorrect = selectedIndex === currentQuizData.correctIndex;
+            const feedbackDiv = document.getElementById('quiz-feedback');
+            
+            currentQuizData.options.forEach((_, idx) => {
+                const btn = document.getElementById(`opt-${idx}`);
+                btn.disabled = true;
+                if (idx === currentQuizData.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            feedbackDiv.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackDiv.classList.add('bg-emerald-900/30', 'border-emerald-500/50', 'text-emerald-200');
+                feedbackDiv.innerHTML = `<strong><i class="fa-solid fa-check-circle"></i> Correto!</strong><br><span class="opacity-80 mt-1 block">${currentQuizData.explanation}</span>`;
+            } else {
+                feedbackDiv.classList.add('bg-red-900/30', 'border-red-500/50', 'text-red-200');
+                feedbackDiv.innerHTML = `<strong><i class="fa-solid fa-times-circle"></i> Incorreto.</strong><br><span class="opacity-80 mt-1 block">${currentQuizData.explanation}</span>`;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // FUNÇÃO DE INTRODUÇÃO (Abre os vídeos Iniciais)
+        // -------------------------------------------------------------
+        function openIntro() {
+            const introData = {
+                name: "Introdução\nà LIBRAS",
+                side: "center",
+                avatar: "mao_nacintura.jpeg", // Força a imagem de mão na cintura na Introdução!
+                description: "Nesta secção especial de introdução, preparamos dois vídeos fundamentais desenvolvidos pela ENAP (Escola Nacional de Administração Pública) para lhe dar a melhor base possível. Estes vídeos demonstram de forma cristalina que a LIBRAS é uma língua viva, completa e indissociável da cultura visual e dos olhos da comunidade surda.",
+                paginas: [
+                    {
+                        explicacao_top: "Vídeo 1: LIBRAS - A Língua que se Vê",
+                        explicacao_bottom: "Assista a esta primeira parte para compreender os conceitos primários da visualidade e o que torna a Língua Brasileira de Sinais única no mundo da comunicação.",
+                        tipo_media: "video",
+                        media_src: "LIBRAS__A_Língua_que_se_Vê.mp4"
+                    },
+                    {
+                        explicacao_top: "Vídeo 2: Libras - Uma Língua Para Olhos",
+                        explicacao_bottom: "Aprofunde o seu conhecimento sobre a perspetiva visual desta língua. Clique em reproduzir e mergulhe neste universo.",
+                        tipo_media: "video",
+                        media_src: "Libras__Uma_Língua_Para_Olhos.mp4"
+                    }
+                ]
+            };
+            openPanel(introData);
+        }
+
+        // -------------------------------------------------------------
+        // DADOS DO MAPA EXPANDIDOS (SEM OS ÁUDIOS)
+        // -------------------------------------------------------------
+        const mapData = {
+            name: "LIBRAS\nSocial\nSustentável",
+            side: "center",
+            description: "A Libras Social Sustentável promove a inclusão da comunidade surda através da Língua Brasileira de Sinais, fundamental para o pilar 'Social' (S) do ESG. Garante acessibilidade digital, reduz barreiras de comunicação e promove cidadania, educação e trabalho digno, conectando surdos a discussões ambientais e sustentáveis.",
+            conclusion: "A inclusão verdadeira utiliza a Libras para garantir que todos tenham acesso a informações, educação e oportunidades de trabalho, contribuindo para uma sociedade mais resiliente e equitativa.",
+            google_notes: "A Libras Social Sustentável promove a inclusão da comunidade surda através da Língua Brasileira de Sinais, fundamental para o pilar 'Social' (S) do ESG. Garante acessibilidade digital, reduz barreiras de comunicação e promove cidadania, educação e trabalho digno, conectando surdos a discussões ambientais e sustentáveis.<br><br><strong>Acessibilidade Digital e ESG:</strong> Ferramentas como o plugin Hand Talk e o VLibras (parceria UFPB/Governo Federal) são cruciais para que surdos acessem informações e serviços, diminuindo desigualdades e atendendo a Lei Brasileira de Inclusão (LBI).<br><br><strong>ODS e Inclusão:</strong> Ações promovem os 17 Objetivos de Desenvolvimento Sustentável (ODS) em Libras, abordando temas como segurança alimentar e consumo consciente.<br><br><strong>Empresas e Impacto Social:</strong> A inclusão de surdos nas práticas ESG evita perda de talentos e o descumprimento legal, promovendo um ambiente corporativo mais diverso, justo e com impacto positivo.<br><br>A inclusão verdadeira utiliza a Libras para garantir que todos tenham acesso a informações, educação e oportunidades de trabalho, contribuindo para uma sociedade mais resiliente e equitativa.",
+            paginas: [
+                {
+                    explicacao_top: "A Libras Social Sustentável promove a inclusão da comunidade surda através da Língua Brasileira de Sinais, fundamental para o pilar 'Social' (S) do ESG. Garante acessibilidade digital, reduz barreiras de comunicação e promove cidadania, educação e trabalho digno, conectando surdos a discussões ambientais e sustentáveis.",
+                    explicacao_bottom: "A inclusão verdadeira utiliza a Libras para garantir que todos tenham acesso a informações, educação e oportunidades de trabalho, contribuindo para uma sociedade mais resiliente e equitativa."
+                },
+                {
+                    explicacao_top: "Expressão em Ação: Sinal de 'Alegre'",
+                    explicacao_bottom: "A LIBRAS utiliza parâmetros visuais, espaciais e motores. O sinal de 'Alegre' demonstra como a expressão facial e o movimento corporal se unem para transmitir um sentimento claro e direto, substituindo a entonação da voz falada.",
+                    tipo_media: "video",
+                    media_src: "alegre.mp4"
+                },
+                {
+                    explicacao_top: "Estrutura e Sintaxe: Construção de Frase",
+                    explicacao_bottom: "Diferente do Português, a LIBRAS possui uma estrutura gramatical própria, baseada no espaço e na visualidade. Este vídeo ilustra como a organização dos sinais constrói sentido e contexto de maneira eficiente e independente das línguas orais.",
+                    tipo_media: "video",
+                    media_src: "Construção de frase (resposta)..mp4"
+                }
+            ],
+            children: [
+                // === LADO ESQUERDO (VERDE) ===
+                {
+                    name: "O que é\nLIBRAS?", side: "left",
+                    description: "A Língua Brasileira de Sinais (LIBRAS) é uma língua natural, complexa e estruturada, de modalidade visual-espacial, possuindo fonologia, morfologia, sintaxe e semântica próprias. Oficializada no Brasil pela Lei 10.436/2002, ela não é mímica nem uma mera versão sinalizada da língua portuguesa. Representa a forma de expressão legítima, o pensamento e a identidade de toda a comunidade surda brasileira.",
+                    conclusion: "Entender que a LIBRAS é um idioma com o mesmo estatuto linguístico do Português é o primeiro passo para o respeito mútuo."
+                },
+                {
+                    name: "Inclusão\nSocial", side: "left",
+                    description: "A verdadeira inclusão social vai muito além de permitir a presença da pessoa surda num ambiente. Trata-se de uma transformação estrutural que garanta acesso equitativo a serviços, oportunidades e espaços de decisão, erradicando o isolamento. Isto exige o derrube de barreiras atitudinais e a adaptação proativa da sociedade para acomodar e valorizar a diversidade humana.",
+                    conclusion: "A inclusão social só ocorre quando a sociedade se adapta à pessoa, e não o oposto.",
+                    children: [
+                        { 
+                            name: "Educação", side: "left", 
+                            description: "A educação é a chave da emancipação. O ensino para surdos deve ser, preferencialmente, bilíngue (LIBRAS como primeira língua e Português escrito como segunda). O sistema falha quando apenas 'integra' o aluno sem os materiais visuais, as metodologias adequadas ou profissionais verdadeiramente fluentes que estimulem o seu pleno desenvolvimento cognitivo."
+                        },
+                        { 
+                            name: "Saúde", side: "left", 
+                            description: "O acesso à saúde para a população surda é frequentemente negligenciado devido à ausência de intérpretes e médicos capacitados. Um atendimento inclusivo garante que o paciente possa comunicar os seus sintomas com precisão, compreender o seu diagnóstico e dar consentimento informado sobre os seus tratamentos."
+                        }
+                    ]
+                },
+                {
+                    name: "Sustenta-\nbilidade", side: "left",
+                    description: "No contexto da surdez, a sustentabilidade refere-se à manutenção e perpetuação da cultura, língua e bem-estar da comunidade ao longo das gerações. Trata-se de criar sistemas de apoio que não dependam da caridade temporária, mas que estejam ancorados em políticas contínuas, integração saudável com a sociedade e uso consciente da tecnologia.",
+                    conclusion: "Sustentabilidade social significa garantir um futuro autônomo para as próximas gerações de surdos.",
+                    children: [
+                        { 
+                            name: "Trabalho", side: "left", 
+                            description: "A sustentabilidade económica exige que o mercado de trabalho combata ativamente a discriminação laboral. Trata-se de oferecer igualdade salarial, adaptações razoáveis no espaço corporativo e, acima de tudo, oportunidades reais de ascensão e liderança profissional para os indivíduos surdos."
+                        },
+                        { 
+                            name: "Meio\nAmbiente", side: "left", 
+                            description: "A consciência ecológica global só é efetiva se for acessível. Incluir a comunidade surda nas discussões sobre meio ambiente requer a criação de sinais técnicos, educação ambiental em LIBRAS e o incentivo ao seu protagonismo nas pautas sobre sustentabilidade planetária."
+                        },
+                        { 
+                            name: "Comunidade\nSurda", side: "left", 
+                            description: "As associações de surdos são o epicentro da resiliência da comunidade. Funcionam como refúgios de proteção, transmissão linguística e mobilização política, fortalecendo a rede de apoio que sustenta os indivíduos face aos desafios impostos por uma sociedade predominantemente ouvinte."
+                        }
+                    ]
+                },
+                {
+                    name: "Cultura\nSurda", side: "left",
+                    description: "A Cultura Surda é o conjunto vibrante de características comportamentais, linguísticas, tradições, arte e normas de interação partilhadas pelas pessoas que utilizam a língua de sinais. Longe da perspetiva clínica de 'cura', esta cultura celebra a surdez não como uma patologia ou ausência, mas como uma forma distinta, rica e visual de experimentar e processar o mundo.",
+                    conclusion: "Reconhecer a Cultura Surda é afastar-se do modelo médico e abraçar a diversidade antropológica.",
+                    children: [
+                        { 
+                            name: "Tecnologia\nAcessível", side: "left", 
+                            description: "A tecnologia deve servir como uma ponte emancipadora. Soluções como serviços de videochamada (Relay), aplicações de tradução em tempo real, legendagem avançada e alarmes visuais ou vibratórios são essenciais para quebrar as fronteiras impostas pela barreira do som no quotidiano."
+                        },
+                        { 
+                            name: "Arte", side: "left", 
+                            description: "As expressões artísticas da comunidade surda, como o Teatro Surdo, a poesia em sinais (SignPoetry), as artes visuais e a dança rítmica, possuem estética, métrica e ritmos próprios baseados na visualidade, manifestando a profundidade das suas emoções e narrativas históricas."
+                        },
+                        { 
+                            name: "Identidade", side: "left", 
+                            description: "A Identidade Surda é uma construção política e social orgulhosa. O indivíduo surdo que se identifica com esta cultura não se sente 'deficiente' nem deseja ser 'consertado'. Ele exige respeito à sua língua e ao seu modo singular de conceber o universo à sua volta."
+                        },
+                        { 
+                            name: "História", side: "left", 
+                            description: "A história dos surdos no Brasil é marcada por longos períodos de opressão e invisibilidade, seguidos de vitórias emblemáticas. Desde o Congresso de Milão em 1880 (que proibiu o uso das línguas de sinais) até à criação do INES e, finalmente, ao reconhecimento oficial da LIBRAS, é uma trajetória inspiradora de resistência inabalável."
+                        }
+                    ]
+                },
+                
+                // === LADO DIREITO (ROXO) ===
+                {
+                    name: "Desafios\nda Inclusão", side: "right",
+                    description: "Apesar dos avanços legais, a plena inclusão encontra resistência numa sociedade construída exclusivamente para ouvintes. Os desafios são multifacetados, abrangendo desde a infraestrutura pública inadequada até barreiras atitudinais profundas. A superação destes obstáculos requer a intervenção e o compromisso ético contínuo do Estado e da iniciativa privada.",
+                    conclusion: "A inclusão não é um favor concedido, é a reparação de uma dívida histórica.",
+                    children: [
+                        {
+                            name: "Barreiras de\nComunicação", side: "right",
+                            description: "A incomunicação é a forma mais violenta de exclusão. Quando o ambiente não oferece os meios adequados de mediação, o sujeito surdo é exilado no seu próprio país, incapaz de exercer tarefas rotineiras, consumir cultura ou aceder a informações essenciais e vitais para a sua segurança e autonomia.",
+                            children: [
+                                { 
+                                    name: "Falta de\nIntérpretes", side: "right", 
+                                    description: "A ausência crónica de Tradutores e Intérpretes de LIBRAS (TILSP) em hospitais, esquadras de polícia, bancos e órgãos públicos constitui uma violação de direitos humanos que coloca em risco a saúde, a integridade física e a justiça para a população surda."
+                                },
+                                { 
+                                    name: "Tecnologia\nLimitada", side: "right", 
+                                    description: "Infelizmente, o mundo digital replica frequentemente as barreiras do mundo físico. Conteúdos institucionais e plataformas cruciais que não disponibilizam legendas de qualidade, nem janelas de intérprete de LIBRAS, excluem impiedosamente a comunidade surda da era da informação."
+                                }
+                            ]
+                        },
+                        {
+                            name: "Preconceito\ne Discriminação", side: "right",
+                            description: "O audismo (ou capacitismo associado à audição) é a crença estrutural e discriminatória de que a vida e as capacidades de quem ouve são superiores às de quem não ouve. Este preconceito manifesta-se através do paternalismo infantilizador, da negação de oportunidades e do desrespeito sistemático pela língua de sinais.",
+                            children: [
+                                { 
+                                    name: "Conscien-\ntização", side: "right", 
+                                    description: "Combater o preconceito exige um choque educativo constante. Campanhas de consciencialização e o fomento de lideranças e influenciadores surdos nos grandes meios de comunicação são cruciais para desconstruir o mito da incapacidade e humanizar a perceção coletiva."
+                                },
+                                { 
+                                    name: "Políticas\nPúblicas", side: "right", 
+                                    description: "Não basta legislar; é preciso executar. Políticas afirmativas urgentes devem englobar a fiscalização rigorosa das leis de acessibilidade e o financiamento público de programas culturais e laborais que corrijam o fosso de desigualdade criado pelo Estado ao longo de séculos."
+                                }
+                            ]
+                        },
+                        {
+                            name: "Acesso à\nEducação", side: "right",
+                            description: "A escola deveria ser a principal ferramenta de libertação, mas, devido à falta de adaptação, torna-se muitas vezes um espaço de segregação e sofrimento escolar. A garantia de uma educação onde o ensino flua primariamente num canal visual (em LIBRAS) é o único caminho para assegurar uma base académica equitativa.",
+                            children: [
+                                { 
+                                    name: "Formação de\nProfessores", side: "right", 
+                                    description: "O ensino da LIBRAS nas licenciaturas é frequentemente demasiado superficial para gerar fluência. O desafio reside na formação contínua dos docentes e na implementação obrigatória da literacia visual em todas as abordagens pedagógicas do sistema educativo."
+                                },
+                                { 
+                                    name: "Materiais\nAdaptados", side: "right", 
+                                    description: "O modelo de ensino tradicional confia demasiado no som e na oralidade. O desenvolvimento de recursos visuais, mapas mentais, glossários em vídeo e plataformas interativas bilíngues são urgências didáticas que não podem ser negligenciadas."
+                                }
+                            ]
+                        },
+                        {
+                            name: "Emprega-\nbilidade", side: "right",
+                            description: "Uma proporção inaceitável de pessoas surdas continua marginalizada ou subempregada em posições que subestimam o seu talento e capacidade intelectual. Transformar o paradigma da empregabilidade requer vontade corporativa de modificar processos inteiros, desde o recrutamento até às dinâmicas diárias de equipa.",
+                            children: [
+                                { 
+                                    name: "Mercado de\nTrabalho", side: "right", 
+                                    description: "O mercado deve abandonar a perspetiva de contratar por mera 'quota' legal para abraçar a diversidade como força estratégica. Isso implica adaptar o onboarding, treinar as equipas ouvintes noções básicas de LIBRAS e instituir metodologias visuais de gestão e comunicação interna."
+                                },
+                                { 
+                                    name: "Capacitação", side: "right", 
+                                    description: "A capacitação técnica contínua é vital para quebrar o ciclo de limitação profissional. O acesso a cursos profissionalizantes e universidades verdadeiramente preparados (com tradutores e metodologia especializada) garantirá a emancipação financeira e o protagonismo do indivíduo."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // =============================================================
+        // DISTRIBUIÇÃO DA SEQUÊNCIA DE AVATARES PELOS ITENS DO MAPA
+        // =============================================================
+        const sequenciaAvatares = [
+            "costas.jpeg", "costas.jpeg", "costas.jpeg", "costas.jpeg", "costas.jpeg", "costas.jpeg",
+            "lado.jpeg", "lado.jpeg", "lado.jpeg",
+            "mao_nacintura.jpeg",
+            "costas.jpeg", "costas.jpeg", "costas.jpeg", "costas.jpeg",
+            "mao_nacintura.jpeg",
+            "lado.jpeg", "lado.jpeg"
+        ];
+
+        let seqCounter = 0;
+        function applyAvatarsToTree(node) {
+            node.avatar = sequenciaAvatares[seqCounter % sequenciaAvatares.length];
+            seqCounter++;
+            if (node.children) {
+                node.children.forEach(applyAvatarsToTree);
+            }
+        }
+        // Aplica a distribuição item por item antes mesmo do mapa desenhar!
+        applyAvatarsToTree(mapData);
+
+        // -------------------------------------------------------------
+        // MOTOR DO MAPA D3.JS
+        // -------------------------------------------------------------
+        const containerNode = document.getElementById("map-container");
+        const container = d3.select("#map-container");
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+
+        const zoom = d3.zoom()
+            .scaleExtent([0.3, 3])
+            .on("zoom", (event) => g.attr("transform", event.transform));
+
+        const svg = container.append("svg")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .call(zoom)
+            .on("dblclick.zoom", null);
+
+        const g = svg.append("g");
+        let initialTransform = d3.zoomIdentity.translate(width / 2, height / 2).scale(0.85);
+        svg.call(zoom.transform, initialTransform);
+
+        // A CORREÇÃO ESTÁ NESTAS DUAS LINHAS. O "...mapData," garante que as notas Google e os textos acompanham a bolha central!
+        const rootRightData = { ...mapData, children: mapData.children.filter(d => d.side === 'right') };
+        const rootLeftData = { ...mapData, children: mapData.children.filter(d => d.side === 'left') };
+
+        let rootRight = d3.hierarchy(rootRightData);
+        let rootLeft = d3.hierarchy(rootLeftData);
+        const treeLayout = d3.tree().nodeSize([65, 230]); 
+
+        let i = 0;
+        rootRight.each(d => { d.id = ++i; d.side = 'right'; d.data.side = 'right'; d.data.nodeIndex = d.id; });
+        rootLeft.each(d => { 
+            if (d.depth > 0) { d.id = ++i; d.side = 'left'; d.data.side = 'left'; d.data.nodeIndex = d.id; } 
+            else { d.id = rootRight.id; d.side = 'center'; d.data.side = 'center'; d.data.nodeIndex = rootRight.id; } 
+        });
+
+        function collapse(d) {
+            if (d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                d.children = null;
+            }
+        }
+        rootRight.children.forEach(d => { if(d.children) d.children.forEach(collapse); });
+        rootLeft.children.forEach(d => { if(d.children) d.children.forEach(collapse); });
+
+        const linkGroup = g.append("g").attr("class", "links");
+        const nodeGroup = g.append("g").attr("class", "nodes");
+
+        function update() {
+            treeLayout(rootRight);
+            treeLayout(rootLeft);
+            rootLeft.each(d => d.y = -d.y);
+
+            const nodes = rootRight.descendants().concat(rootLeft.descendants().slice(1));
+            const links = rootRight.links().concat(rootLeft.links());
+
+            const node = nodeGroup.selectAll("g.node").data(nodes, d => d.id);
+            const nodeEnter = node.enter().append("g")
+                .attr("class", d => `node ${d.data.side || d.side}`)
+                .attr("transform", d => `translate(${d.parent ? d.parent.y : 0},${d.parent ? d.parent.x : 0})`)
+                .on("click", click);
+
+            nodeEnter.append("circle").attr("r", 0).style("opacity", 0);
+
+            nodeEnter.append("text")
+                .attr("dy", 0)
+                .style("fill-opacity", 0)
+                .each(function(d) {
+                    const lines = d.data.name.split("\n");
+                    const yOffset = -((lines.length - 1) * 12) / 2;
+                    d3.select(this).selectAll("tspan")
+                        .data(lines).enter().append("tspan")
+                        .attr("x", 0)
+                        .attr("y", (line, idx) => yOffset + (idx * 12))
+                        .text(line => line);
+                });
+
+            const nodeUpdate = nodeEnter.merge(node)
+                .transition().duration(600)
+                .attr("transform", d => `translate(${d.y},${d.x})`);
+
+            nodeUpdate.select("circle")
+                .attr("r", d => d.depth === 0 ? 55 : (d.depth === 1 ? 45 : 35))
+                .style("opacity", 1);
+            nodeUpdate.select("text").style("fill-opacity", 1);
+
+            const nodeExit = node.exit()
+                .transition().duration(600)
+                .attr("transform", d => `translate(${d.parent.y},${d.parent.x})`)
+                .remove();
+            nodeExit.select("circle").attr("r", 0);
+            nodeExit.select("text").style("fill-opacity", 0);
+
+            const link = linkGroup.selectAll("path.link").data(links, d => d.target.id);
+            const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+
+            const linkEnter = link.enter().append("path")
+                .attr("class", d => `link ${d.target.side || d.target.data.side}`)
+                .attr("d", d => {
+                    const o = {x: d.source.x, y: d.source.y};
+                    return diagonal({source: o, target: o});
+                });
+
+            linkEnter.merge(link).transition().duration(600).attr("d", diagonal);
+
+            link.exit().transition().duration(600)
+                .attr("d", d => {
+                    const o = {x: d.source.x, y: d.source.y};
+                    return diagonal({source: o, target: o});
+                }).remove();
+        }
+
+        function click(event, d) {
+            event.stopPropagation();
+            openPanel(d.data);
+            
+            const scale = d3.zoomTransform(svg.node()).k;
+            const newTransform = d3.zoomIdentity
+                .translate(width / 2 - d.y * scale, height / 2 - d.x * scale)
+                .scale(scale);
+            svg.transition().duration(600).call(zoom.transform, newTransform);
+
+            if (d.depth === 0) return;
+
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            update();
+        }
+
+        // -------------------------------------------------------------
+        // LÓGICA DO PAINEL LATERAL COM AVATAR DISTRIBUÍDO POR ITEM
+        // -------------------------------------------------------------
+        const panel = document.getElementById('side-panel');
+        let currentModalDados = null;
+        let currentPageIndex = 0;
+
+        function openPanel(data) {
+            currentModalDados = data;
+            currentPageIndex = 0;
+            
+            document.getElementById('panel-title').innerText = data.name.replace(/\n/g, ' ');
+            
+            const subtitle = document.getElementById('panel-subtitle');
+            const header = document.getElementById('panel-header');
+            const descContainer = document.getElementById('panel-desc-container');
+
+            // Resetar áreas de IA ao abrir novo tópico
+            document.getElementById('ai-chat-section').classList.add('hidden');
+            document.getElementById('ai-quiz-section').classList.add('hidden');
+            document.getElementById('ai-response').classList.add('hidden');
+            document.getElementById('ai-input').value = '';
+            currentQuizData = null;
+
+            // Lógica da Caixa de Notas (Google)
+            const notesContainer = document.getElementById('panel-notes-container');
+            const notesText = document.getElementById('panel-notes-text');
+            if (data.google_notes) {
+                notesText.innerHTML = data.google_notes;
+                notesContainer.classList.remove('hidden');
+            } else {
+                notesContainer.classList.add('hidden');
+            }
+
+            // ==========================================
+            // LÓGICA DO AVATAR DISTRIBUÍDO POR ITEM
+            // ==========================================
+            const avatarCont = document.getElementById('floating-avatar-container');
+            const avatarImg = document.getElementById('floating-avatar-element');
+            
+            // Pega no avatar que foi permanentemente colado a este item na árvore
+            avatarImg.src = data.avatar || "costas.jpeg";
+
+            // Exibe o avatar
+            avatarCont.classList.remove('hidden');
+
+            // Atualiza a borda do Avatar consoante o lado que abre (verde/roxo)
+            if (data.side === 'right') {
+                avatarImg.classList.remove('border-emerald-500', 'shadow-[0_0_25px_rgba(16,185,129,0.6)]');
+                avatarImg.classList.add('border-purple-500', 'shadow-[0_0_25px_rgba(168,85,247,0.6)]');
+            } else {
+                avatarImg.classList.remove('border-purple-500', 'shadow-[0_0_25px_rgba(168,85,247,0.6)]');
+                avatarImg.classList.add('border-emerald-500', 'shadow-[0_0_25px_rgba(16,185,129,0.6)]');
+            }
+
+            // Ajusta cores baseado no lado
+            if (data.side === 'left') {
+                subtitle.innerText = "Trilhas de LIBRAS"; 
+                subtitle.style.color = "#34d399"; // Verde neon
+                header.style.borderBottomColor = "#10b981";
+                descContainer.className = "bg-white/5 border-l-4 border-emerald-500 p-5 rounded-2xl mb-6 font-medium text-lg shadow-sm";
+            } else if (data.side === 'right') {
+                subtitle.innerText = "Desafios da Inclusão"; 
+                subtitle.style.color = "#c084fc"; // Roxo neon claro
+                header.style.borderBottomColor = "#a855f7"; // Roxo neon forte
+                descContainer.className = "bg-white/5 border-l-4 border-purple-500 p-5 rounded-2xl mb-6 font-medium text-lg shadow-sm";
+            } else {
+                subtitle.innerText = "Tópico Central"; 
+                subtitle.style.color = "#34d399"; 
+                header.style.borderBottomColor = "#10b981";
+                descContainer.className = "bg-white/5 border-l-4 border-emerald-500 p-5 rounded-2xl mb-6 font-medium text-lg shadow-sm";
+            }
+
+            renderizarPaginaPanel();
+            panel.classList.add('open');
+        }
+
+        function renderizarPaginaPanel() {
+            const panelVideo = document.getElementById('panel-video');
+            const panelAudio = document.getElementById('panel-audio');
+            const mediaContainer = document.getElementById('panel-media-container');
+            const descTop = document.getElementById('panel-desc-top');
+            const descBottom = document.getElementById('panel-desc-bottom');
+            const pagination = document.getElementById('panel-pagination');
+
+            let paginas = currentModalDados.paginas;
+            if (!paginas) {
+                paginas = [{
+                    explicacao_top: currentModalDados.description || "Sem descrição disponível.",
+                    explicacao_bottom: currentModalDados.conclusion || "Utiliza o mapa para explorar as ramificações deste assunto e aprofundar os teus conhecimentos.",
+                    tipo_media: currentModalDados.audio_src ? "audio" : null,
+                    audio_src: currentModalDados.audio_src,
+                    media_src: currentModalDados.media_src
+                }];
+            }
+
+            const paginaAtual = paginas[currentPageIndex];
+
+            // Atualiza Textos
+            descTop.innerText = paginaAtual.explicacao_top;
+            descBottom.innerText = paginaAtual.explicacao_bottom || "Continua a explorar o mapa mental e testa os teus conhecimentos com a IA.";
+            
+            // Pausa e limpa qualquer mídia a tocar
+            if (!panelVideo.paused) panelVideo.pause();
+            if (!panelAudio.paused) panelAudio.pause();
+            panelVideo.removeAttribute('src');
+            panelAudio.removeAttribute('src');
+            
+            // Esconde conteiners por padrão
+            mediaContainer.classList.add('hidden');
+            panelVideo.classList.add('hidden');
+            panelAudio.classList.add('hidden');
+            
+            let hasMedia = false;
+
+            // Verifica e carrega o áudio (Prioridade se explicitado no nó)
+            if (paginaAtual.tipo_media === 'audio' || (paginaAtual.audio_src && paginaAtual.tipo_media !== 'video')) {
+                panelAudio.src = paginaAtual.audio_src || paginaAtual.media_src;
+                panelAudio.classList.remove('hidden');
+                panelAudio.load();
+                hasMedia = true;
+            } 
+            // Verifica e carrega o vídeo se especificado explicitamente como video ou extensão mp4
+            else if (paginaAtual.tipo_media === 'video' || (paginaAtual.media_src && paginaAtual.media_src.endsWith('.mp4'))) {
+                panelVideo.src = paginaAtual.media_src;
+                panelVideo.classList.remove('hidden');
+                panelVideo.load();
+                hasMedia = true;
+            }
+
+            if (hasMedia) {
+                mediaContainer.classList.remove('hidden');
+            }
+
+            // Exibe a paginação se houver mais de 1 página
+            if (paginas.length > 1) {
+                pagination.classList.remove('hidden');
+                document.getElementById('page-indicator').innerText = `${currentPageIndex + 1} / ${paginas.length}`;
+                
+                const btnPrev = document.getElementById('btn-prev');
+                const btnNext = document.getElementById('btn-next');
+                
+                btnPrev.disabled = currentPageIndex === 0;
+                btnNext.disabled = currentPageIndex === paginas.length - 1;
+                btnPrev.style.opacity = currentPageIndex === 0 ? '0.5' : '1';
+                btnNext.style.opacity = currentPageIndex === paginas.length - 1 ? '0.5' : '1';
+            } else {
+                pagination.classList.add('hidden');
+            }
+        }
+
+        function mudarPagina(direcao) {
+            let paginas = currentModalDados.paginas || [currentModalDados];
+            const novaPagina = currentPageIndex + direcao;
+            
+            if (novaPagina >= 0 && novaPagina < paginas.length) {
+                currentPageIndex = novaPagina;
+                renderizarPaginaPanel();
+            }
+        }
+
+        function closePanel() {
+            panel.classList.remove('open');
+            const panelVideo = document.getElementById('panel-video');
+            const panelAudio = document.getElementById('panel-audio');
+            if (!panelVideo.paused) panelVideo.pause();
+            if (!panelAudio.paused) panelAudio.pause();
+            
+            // Esconder o avatar flutuante ao fechar
+            const avatarCont = document.getElementById('floating-avatar-container');
+            avatarCont.classList.add('hidden');
+            
+            // Resetar a posição do avatar para o local original na próxima vez
+            avatarCont.style.top = '';
+            avatarCont.style.left = '';
+            avatarCont.style.bottom = '';
+            avatarCont.classList.add('transition-all', 'duration-500');
+        }
+
+        function zoomIn() { svg.transition().duration(400).call(zoom.scaleBy, 1.3); }
+        function zoomOut() { svg.transition().duration(400).call(zoom.scaleBy, 0.7); }
+        function resetZoom() { svg.transition().duration(600).call(zoom.transform, initialTransform); }
+
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+        });
+
+        // -------------------------------------------------------------
+        // LÓGICA DE ARRASTAR O AVATAR (DRAG & DROP)
+        // -------------------------------------------------------------
+        const dragAvatarContainer = document.getElementById('floating-avatar-container');
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        dragAvatarContainer.onmousedown = dragMouseDown;
+        dragAvatarContainer.ontouchstart = dragMouseDown;
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            // Evita comportamentos estranhos ao clicar na imagem
+            if(e.type === 'mousedown') e.preventDefault();
+            
+            if (e.type === 'touchstart') {
+                pos3 = e.touches[0].clientX;
+                pos4 = e.touches[0].clientY;
+            } else {
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+            }
+            
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+            document.ontouchend = closeDragElement;
+            document.ontouchmove = elementDrag;
+            
+            // Remove as animações de transição para o arrasto ser fluido
+            dragAvatarContainer.classList.remove('transition-all', 'duration-500');
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            
+            let clientX, clientY;
+            if (e.type === 'touchmove') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                e.preventDefault();
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
+            pos1 = pos3 - clientX;
+            pos2 = pos4 - clientY;
+            pos3 = clientX;
+            pos4 = clientY;
+            
+            // Removemos o 'bottom' do tailwind para permitir mover livremente pelo 'top'
+            dragAvatarContainer.style.bottom = 'auto'; 
+            dragAvatarContainer.style.top = (dragAvatarContainer.offsetTop - pos2) + "px";
+            dragAvatarContainer.style.left = (dragAvatarContainer.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+            document.ontouchend = null;
+            document.ontouchmove = null;
+        }
+
+        // Inicia a renderização do mapa
+        update();
+    </script>
+</body>
+</html>

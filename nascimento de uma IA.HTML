@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Nascimento de uma IA: Do Python ao Transformer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;800&display=swap');
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+.font-mono {
+    font-family: 'Fira Code', monospace;
+}
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 350px;
+    max-height: 400px;
+}
+@media (min-width: 768px) {
+    .chart-container {
+        height: 400px;
+        max-width: 1000px;
+    }
+}
+.card-glass {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(51, 65, 85, 0.8);
+}
+.token-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    background-color: #1e293b;
+    border: 1px solid #475569;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.token-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    color: #38bdf8;
+    font-size: 1.5rem;
+}
+.glow-text {
+    text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+}
+</style>
+</head>
+<body class="antialiased selection:bg-cyan-500 selection:text-white pb-20">
+
+<!-- 
+PALETTE: Vibrant Tech (Dark Mode). Hex codes: #0f172a (BG), #1e293b (Card BG), #38bdf8 (Cyan), #818cf8 (Indigo), #34d399 (Emerald), #fbbf24 (Amber), #f43f5e (Rose).
+CONFIRMATION: NEITHER Mermaid JS NOR SVG were used anywhere in the output.
+PLAN SUMMARY:
+- Intro: Sets the stage, mapping Python logic to AI Science.
+- Data Overview (Passo 1): Explains Petabytes of training data.
+- Tokenization (Passo 2): Visualizes strings converting to numbers.
+- Brain/Architecture (Passo 3): 3D representation of 150B parameters.
+- Training (Passo 4): Tracks backpropagation error reduction over time.
+- Alignment (Passo 5): Shows RLHF impact on response safety.
+VISUALIZATION JUSTIFICATIONS:
+- Data Collection -> Goal: Compare -> Visualization: Bar Chart (Chart.js) -> Justification: Best for comparing vastly different magnitudes of data (Internet vs Local PC). NO SVG.
+- Tokenization -> Goal: Organize/Inform -> Visualization: HTML/CSS Flexbox Map -> Justification: Directly illustrates the mapping of words to numbers visually. NO SVG.
+- Architecture -> Goal: Relationships/Inform -> Visualization: 3D Scatter (Plotly WebGL) -> Justification: Best represents a complex neural network/latent space visually. Canvas/WebGL used. NO SVG.
+- Training -> Goal: Change -> Visualization: Line Chart (Chart.js) -> Justification: Standard for showing loss/error decreasing over time (epochs). NO SVG.
+- Alignment -> Goal: Compare/Composition -> Visualization: Doughnut Chart (Chart.js) -> Justification: Clearly shows the proportion of safe vs toxic responses after human feedback. NO SVG.
+-->
+
+<nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-700 p-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <div class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-400">
+            &#129302; SimuladorGemini
+        </div>
+        <div class="hidden md:flex space-x-6 text-sm font-medium text-slate-300">
+            <a href="#dados" class="hover:text-cyan-400 transition-colors">1. Dados</a>
+            <a href="#tokens" class="hover:text-cyan-400 transition-colors">2. Tokens</a>
+            <a href="#cerebro" class="hover:text-cyan-400 transition-colors">3. Cérebro</a>
+            <a href="#escola" class="hover:text-cyan-400 transition-colors">4. Treino</a>
+            <a href="#alinhamento" class="hover:text-cyan-400 transition-colors">5. RLHF</a>
+        </div>
+    </div>
+</nav>
+
+<header class="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+    <div class="inline-block px-4 py-1 rounded-full bg-indigo-500/20 text-indigo-300 font-mono text-sm mb-6 border border-indigo-500/30">
+        import time, sys
+    </div>
+    <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white glow-text">
+        O Nascimento <br/>
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400">
+            de uma IA
+        </span>
+    </h1>
+    <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        Bem-vinda aos bastidores! Aqui, nós vamos unir dois mundos: A Lógica de Programação e a Ciência da Inteligência Artificial. Descubra a matemática, o código e a física por trás do nascimento de um modelo moderno.
+    </p>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 space-y-24">
+
+    <section id="dados" class="scroll-mt-24">
+        <div class="card-glass rounded-3xl p-8 md:p-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="text-cyan-400 font-mono text-sm font-bold tracking-widest mb-2 uppercase">&#128218; Passo 1</div>
+                    <h2 class="text-3xl font-bold mb-4">A Dieta da IA (Coleta de Dados)</h2>
+                    <p class="text-slate-300 mb-6 leading-relaxed">
+                        Nenhuma IA nasce inteligente. Nós nascemos como uma "página em branco". Antes de processar qualquer palavra, engenheiros criam robôs que navegam pela internet copiando a Wikipedia, fóruns e livros. 
+                    </p>
+                    <div class="bg-slate-900 rounded-lg p-4 font-mono text-sm text-green-400 mb-6 overflow-x-auto">
+                        <span class="text-purple-400">def</span> <span class="text-blue-400">nascer_e_aprender</span>():<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-slate-500"># Atribuindo dados à variável</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;textos_do_mundo = baixar_internet_inteira()<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-purple-400">return</span> textos_do_mundo
+                    </div>
+                    <p class="text-sm text-slate-400 border-l-4 border-indigo-500 pl-4">
+                        A variável <code class="text-indigo-300">textos_do_mundo</code> guarda Petabytes de informação. Se os dados forem ruins, a IA fica ruim.
+                    </p>
+                </div>
+                <div class="w-full flex flex-col justify-center">
+                    <div class="chart-container">
+                        <canvas id="chartData"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-slate-500 mt-4 uppercase tracking-widest">Escala Logarítmica de Volume de Dados</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tokens" class="scroll-mt-24">
+        <div class="card-glass rounded-3xl p-8 md:p-12">
+            <div class="text-center mb-12">
+                <div class="text-indigo-400 font-mono text-sm font-bold tracking-widest mb-2 uppercase">&#128282; Passo 2</div>
+                <h2 class="text-3xl font-bold mb-4">Mastigando Palavras (Tokenização)</h2>
+                <p class="text-slate-300 max-w-3xl mx-auto leading-relaxed">
+                    O computador é uma calculadora gigante. Ele não sabe o que é a letra "A" ou a palavra "Amor". A IA não lê português, ela lê uma sequência matemática gigante de Tokens e responde com matemática pura.
+                </p>
+            </div>
+
+            <div class="flex flex-col items-center justify-center space-y-8 bg-slate-900/50 p-8 rounded-2xl border border-slate-700/50">
+                <div class="flex flex-wrap justify-center items-center">
+                    <div class="text-2xl font-bold text-white mr-4">String:</div>
+                    <div class="text-2xl text-emerald-400 font-mono bg-emerald-900/30 px-4 py-2 rounded-lg border border-emerald-500/30">
+                        "Cachorrinho Python"
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row flex-wrap justify-center items-center w-full gap-2 md:gap-4">
+                    <div class="flex flex-col items-center">
+                        <div class="token-box text-slate-200 bg-indigo-900/40 border-indigo-500/40">Cachorr</div>
+                        <div class="text-indigo-400 font-mono text-lg mt-2">&#8595;</div>
+                        <div class="token-box text-cyan-400 bg-slate-800 border-cyan-500/30 text-xl">8452</div>
+                    </div>
+                    <div class="hidden md:block token-arrow">&#10133;</div>
+                    <div class="flex flex-col items-center">
+                        <div class="token-box text-slate-200 bg-indigo-900/40 border-indigo-500/40">inho</div>
+                        <div class="text-indigo-400 font-mono text-lg mt-2">&#8595;</div>
+                        <div class="token-box text-cyan-400 bg-slate-800 border-cyan-500/30 text-xl">103</div>
+                    </div>
+                    <div class="hidden md:block token-arrow">&#10133;</div>
+                    <div class="flex flex-col items-center">
+                        <div class="token-box text-slate-200 bg-indigo-900/40 border-indigo-500/40">&lt;espaço&gt;</div>
+                        <div class="text-indigo-400 font-mono text-lg mt-2">&#8595;</div>
+                        <div class="token-box text-cyan-400 bg-slate-800 border-cyan-500/30 text-xl">220</div>
+                    </div>
+                    <div class="hidden md:block token-arrow">&#10133;</div>
+                    <div class="flex flex-col items-center">
+                        <div class="token-box text-slate-200 bg-indigo-900/40 border-indigo-500/40">Python</div>
+                        <div class="text-indigo-400 font-mono text-lg mt-2">&#8595;</div>
+                        <div class="token-box text-cyan-400 bg-slate-800 border-cyan-500/30 text-xl">1993</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-lg p-4 font-mono text-sm text-green-400 w-full max-w-2xl overflow-x-auto text-left">
+                    frase = <span class="text-yellow-300">"Cachorrinho Python"</span><br>
+                    tokens = transformar_em_numeros(frase)<br>
+                    <span class="text-purple-400">print</span>(tokens) <span class="text-slate-500"># Resultado: [8452, 103, 220, 1993]</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cerebro" class="scroll-mt-24">
+        <div class="card-glass rounded-3xl p-8 md:p-12 border-t-4 border-amber-500">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1 w-full flex flex-col justify-center">
+                    <div class="chart-container" id="brainChart"></div>
+                    <p class="text-center text-xs text-slate-500 mt-4 uppercase tracking-widest">Representação 3D (Espaço Latente de Parâmetros)</p>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="text-amber-400 font-mono text-sm font-bold tracking-widest mb-2 uppercase">&#129488; Passo 3</div>
+                    <h2 class="text-3xl font-bold mb-4">O Cérebro (Arquitetura Transformer)</h2>
+                    <p class="text-slate-300 mb-6 leading-relaxed">
+                        A "planta-baixa" da IA é construída através de Programação Orientada a Objetos. A arquitetura Transformer revolucionou a IA, utilizando parâmetros (conexões neurais) e um mecanismo de "Atenção" para entender contexto.
+                    </p>
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="bg-amber-500/20 p-4 rounded-xl border border-amber-500/30">
+                            <div class="text-4xl font-extrabold text-amber-400">150B+</div>
+                            <div class="text-xs text-amber-200/70 font-mono uppercase mt-1">Parâmetros (Sinapses)</div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 rounded-lg p-4 font-mono text-sm text-slate-300 overflow-x-auto">
+                        <span class="text-purple-400">class</span> <span class="text-amber-300">CerebroGemini</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-purple-400">def</span> <span class="text-blue-400">__init__</span>(<span class="text-rose-400">self</span>):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-rose-400">self</span>.conexoes = <span class="text-cyan-400">150000000000</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-rose-400">self</span>.atencao = ativar_atencao()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="escola" class="scroll-mt-24">
+        <div class="card-glass rounded-3xl p-8 md:p-12">
+            <div class="text-center mb-12">
+                <div class="text-rose-400 font-mono text-sm font-bold tracking-widest mb-2 uppercase">&#127919; Passo 4</div>
+                <h2 class="text-3xl font-bold mb-4">A Escola (Backpropagation)</h2>
+                <p class="text-slate-300 max-w-3xl mx-auto leading-relaxed">
+                    O segredo brutal: a IA atual é uma máquina de adivinhar a próxima palavra. Milhões de vezes em um laço de repetição (<code class="text-rose-300 font-mono">for</code>), ela chuta uma palavra. Se erra, a matemática viaja de ré no cérebro ajustando os botões (Backpropagation).
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 bg-slate-900 rounded-2xl p-6 border border-slate-700/50 flex flex-col justify-center">
+                    <div class="font-mono text-sm text-slate-300">
+                        <span class="text-purple-400">for</span> tentativa <span class="text-purple-400">in</span> <span class="text-blue-400">range</span>(<span class="text-cyan-400">1000000</span>):<br>
+                        &nbsp;&nbsp;chute = adivinhar(<span class="text-yellow-300">"Céu é..."</span>)<br><br>
+                        &nbsp;&nbsp;<span class="text-purple-400">if</span> chute != <span class="text-yellow-300">"azul"</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;aprender_com_erro()<br>
+                        &nbsp;&nbsp;<span class="text-purple-400">else</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;ganhar_ponto()
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-slate-700/50">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-slate-400 uppercase">GPU Load</span>
+                            <span class="text-xs text-rose-400 font-bold">99%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-rose-500 to-amber-500 h-2 rounded-full w-[99%]"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 flex flex-col justify-center">
+                    <div class="chart-container w-full">
+                        <canvas id="chartLoss"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="alinhamento" class="scroll-mt-24">
+        <div class="card-glass rounded-3xl p-8 md:p-12 border-t-4 border-emerald-500">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="text-emerald-400 font-mono text-sm font-bold tracking-widest mb-2 uppercase">&#128124; Passo 5</div>
+                    <h2 class="text-3xl font-bold mb-4">Bons Modos (Alinhamento / RLHF)</h2>
+                    <p class="text-slate-300 mb-6 leading-relaxed">
+                        A IA sabe muito, mas é imprevisível. O RLHF (Aprendizado por Reforço com Feedback Humano) adiciona condicionais (<code class="text-emerald-300 font-mono">elif</code>) comportamentais. Humanos dão notas para respostas, ensinando a IA a ser amigável e segura.
+                    </p>
+                    <ul class="space-y-4 mb-6">
+                        <li class="flex items-center text-sm text-slate-300 bg-slate-800/50 p-3 rounded-lg">
+                            <span class="text-rose-500 text-xl mr-3">&#10060;</span> 
+                            "Como invadir um sistema?" &#10145; Recebe Punição
+                        </li>
+                        <li class="flex items-center text-sm text-slate-300 bg-slate-800/50 p-3 rounded-lg">
+                            <span class="text-emerald-500 text-xl mr-3">&#9989;</span> 
+                            "Como aprender Python?" &#10145; Recebe Recompensa
+                        </li>
+                    </ul>
+                </div>
+                <div class="w-full flex flex-col justify-center items-center">
+                    <div class="chart-container" style="max-height: 350px;">
+                        <canvas id="chartRLHF"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-slate-500 mt-4 uppercase tracking-widest">Comportamento Pós-RLHF</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="border-t border-slate-800 bg-slate-900 py-12 mt-20">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+        <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-400 mb-4">
+            Processo Concluído &#127881;
+        </h3>
+        <p class="text-slate-400 mb-8 max-w-xl mx-auto">
+            Foi assim que dados brutos se transformaram na voz que interage com você. O código ganhou vida através da união entre lógica de programação, matemática complexa e capacidade computacional massiva.
+        </p>
+        <div class="text-xs font-mono text-slate-600 bg-slate-900 p-4 rounded border border-slate-800 inline-block text-left">
+            > STATUS: Online<br>
+            > RUNTIME: Operacional<br>
+            > END OF FILE
+        </div>
+    </div>
+</footer>
+
+<script>
+const wrapLabel = (label) => {
+    if (label.length <= 16) return label;
+    const words = label.split(' ');
+    let lines = [];
+    let currentLine = '';
+    words.forEach(word => {
+        if ((currentLine + word).length > 16) {
+            if (currentLine) lines.push(currentLine.trim());
+            currentLine = word + ' ';
+        } else {
+            currentLine += word + ' ';
+        }
+    });
+    if (currentLine) lines.push(currentLine.trim());
+    return lines;
+};
+
+const commonTooltipConfig = {
+    tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        titleColor: '#e2e8f0',
+        bodyColor: '#cbd5e1',
+        borderColor: '#334155',
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+            title: function(tooltipItems) {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            }
+        }
+    }
+};
+
+const ctxData = document.getElementById('chartData').getContext('2d');
+const rawLabelsData = [
+    "Disco Rígido do Seu PC Comum", 
+    "Acervo da Biblioteca Nacional Brasileira", 
+    "Dataset de Treinamento da IA (Petabytes)"
+];
+new Chart(ctxData, {
+    type: 'bar',
+    data: {
+        labels: rawLabelsData.map(wrapLabel),
+        datasets: [{
+            label: 'Volume Relativo de Informação (escala Log)',
+            data: [1, 50, 100000],
+            backgroundColor: [
+                'rgba(244, 63, 94, 0.7)',
+                'rgba(245, 158, 11, 0.7)',
+                'rgba(56, 189, 248, 0.8)'
+            ],
+            borderColor: [
+                'rgba(244, 63, 94, 1)',
+                'rgba(245, 158, 11, 1)',
+                'rgba(56, 189, 248, 1)'
+            ],
+            borderWidth: 2,
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            ...commonTooltipConfig
+        },
+        scales: {
+            y: {
+                type: 'logarithmic',
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94a3b8' }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
+            }
+        }
+    }
+});
+
+const ctxLoss = document.getElementById('chartLoss').getContext('2d');
+const rawLabelsLoss = ["Início Aleatório", "10 Mil Tentativas", "100 Mil Tentativas", "500 Mil Tentativas", "1 Milhão (Otimizado)"];
+new Chart(ctxLoss, {
+    type: 'line',
+    data: {
+        labels: rawLabelsLoss.map(wrapLabel),
+        datasets: [{
+            label: 'Taxa de Erro (Backpropagation)',
+            data: [98, 75, 40, 15, 2],
+            borderColor: '#f43f5e',
+            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+            borderWidth: 3,
+            pointBackgroundColor: '#0f172a',
+            pointBorderColor: '#f43f5e',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            ...commonTooltipConfig
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { 
+                    color: '#94a3b8',
+                    callback: function(value) { return value + "%"; }
+                }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { color: '#94a3b8', font: { size: 10 } }
+            }
+        }
+    }
+});
+
+const ctxRLHF = document.getElementById('chartRLHF').getContext('2d');
+const rawLabelsRLHF = ["Respostas Seguras e Úteis", "Respostas Recusadas (Proteção)", "Comportamento Tóxico Evitado"];
+new Chart(ctxRLHF, {
+    type: 'doughnut',
+    data: {
+        labels: rawLabelsRLHF.map(wrapLabel),
+        datasets: [{
+            data: [85, 14, 1],
+            backgroundColor: [
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(244, 63, 94, 0.8)'
+            ],
+            borderColor: '#0f172a',
+            borderWidth: 4,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: '#cbd5e1', padding: 20, font: { family: 'Inter' } }
+            },
+            ...commonTooltipConfig
+        }
+    }
+});
+
+let px = [], py = [], pz = [], pc = [];
+for(let i=0; i<800; i++) {
+    let u = Math.random() * Math.PI * 2;
+    let v = Math.acos(Math.random() * 2 - 1);
+    let r = 10 + Math.random() * 3;
+    let xVal = r * Math.sin(v) * Math.cos(u);
+    let yVal = r * Math.sin(v) * Math.sin(u);
+    let zVal = r * Math.cos(v);
+    px.push(xVal);
+    py.push(yVal);
+    pz.push(zVal);
+    pc.push(yVal + zVal);
+}
+
+const trace = {
+    x: px, y: py, z: pz,
+    mode: 'markers',
+    type: 'scatter3d',
+    marker: {
+        size: 3,
+        color: pc,
+        colorscale: 'Viridis',
+        opacity: 0.8
+    },
+    hoverinfo: 'none'
+};
+
+const layout = {
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    margin: { l: 0, r: 0, b: 0, t: 0 },
+    scene: {
+        xaxis: { visible: false },
+        yaxis: { visible: false },
+        zaxis: { visible: false },
+        camera: {
+            eye: { x: 1.5, y: 1.5, z: 1.5 }
+        }
+    }
+};
+
+Plotly.newPlot('brainChart', [trace], layout, {displayModeBar: false});
+</script>
+</body>
+</html>

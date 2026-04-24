@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apostila de Python para Iniciantes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f5f5f0;
+    color: #1a1a2e;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* CAPA */
+  .capa {
+    background: linear-gradient(135deg, #1a2035 0%, #2e3a5e 50%, #1e5f74 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+  .capa .snake-emoji { font-size: 90px; margin-bottom: 30px; }
+  .capa h1 { font-size: 48px; font-weight: 900; letter-spacing: -1px; line-height: 1.1; margin-bottom: 16px; }
+  .capa .subtitulo { font-size: 20px; opacity: 0.85; margin-bottom: 40px; }
+  .capa .badge {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 999px;
+    padding: 10px 28px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .capa .indice {
+    margin-top: 60px;
+    text-align: left;
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 28px 36px;
+    max-width: 500px;
+    width: 100%;
+  }
+  .capa .indice h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-bottom: 14px; }
+  .capa .indice ol { list-style: none; }
+  .capa .indice li {
+    padding: 5px 0;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .capa .indice li:last-child { border-bottom: none; }
+  .capa .indice li span.num { opacity: 0.5; font-size: 12px; min-width: 20px; }
+
+  /* SEÇÕES */
+  .secao {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 60px 40px;
+    page-break-inside: avoid;
+  }
+
+  .capitulo-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #f5a008;
+  }
+  .capitulo-header .num {
+    background: #f5a008;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .capitulo-header h2 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1a2035;
+    line-height: 1.2;
+  }
+  .capitulo-header .emoji { font-size: 32px; }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a2035;
+    margin: 32px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h3::before { content: "▸"; color: #f5a008; }
+
+  p { margin-bottom: 14px; }
+
+  /* CAIXAS */
+  .caixa {
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    font-size: 14.5px;
+  }
+  .caixa-dica {
+    background: #fffbeb;
+    border-left: 4px solid #f5a008;
+  }
+  .caixa-dica strong { color: #b45309; }
+  .caixa-atencao {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+  }
+  .caixa-atencao strong { color: #dc2626; }
+  .caixa-info {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+  }
+  .caixa-info strong { color: #1d4ed8; }
+  .caixa-sucesso {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+  }
+  .caixa-sucesso strong { color: #15803d; }
+
+  /* CÓDIGO */
+  pre {
+    background: #0d1117;
+    color: #c9d1d9;
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin: 16px 0;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    border: 1px solid #30363d;
+    position: relative;
+  }
+  pre .titulo-code {
+    position: absolute;
+    top: 8px;
+    right: 14px;
+    font-size: 11px;
+    color: #8b949e;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  code { font-family: 'Consolas', 'Monaco', monospace; }
+
+  /* Syntax highlight manual */
+  .py-kw { color: #ff7b72; }       /* keywords */
+  .py-str { color: #a5d6ff; }      /* strings */
+  .py-num { color: #79c0ff; }      /* numbers */
+  .py-fn { color: #d2a8ff; }       /* functions */
+  .py-cm { color: #8b949e; }       /* comments */
+  .py-op { color: #ff7b72; }       /* operators */
+  .py-var { color: #ffa657; }      /* variables */
+  .py-out { color: #3fb950; }      /* output */
+
+  code.inline {
+    background: #e8e8e8;
+    color: #c7254e;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 13.5px;
+  }
+
+  /* TABELAS */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  thead tr { background: #1a2035; color: white; }
+  thead th { padding: 12px 16px; text-align: left; font-weight: 700; }
+  tbody tr:nth-child(even) { background: #f0f0e8; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 11px 16px; border-bottom: 1px solid #e5e5e5; }
+
+  /* EXERCÍCIOS */
+  .exercicio {
+    background: linear-gradient(135deg, #1a2035, #2e3a5e);
+    color: white;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 28px 0;
+  }
+  .exercicio h4 {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .exercicio ol { padding-left: 20px; }
+  .exercicio ol li { margin-bottom: 8px; opacity: 0.9; }
+
+  /* DIVISOR */
+  .divisor {
+    height: 2px;
+    background: linear-gradient(to right, #f5a008, transparent);
+    margin: 40px 0;
+  }
+
+  /* LISTA */
+  ul.lista, ol.lista {
+    padding-left: 22px;
+    margin: 14px 0;
+  }
+  ul.lista li, ol.lista li {
+    margin-bottom: 8px;
+  }
+  ul.lista li::marker { color: #f5a008; }
+
+  .badge-novidade {
+    display: inline-block;
+    background: #f5a008;
+    color: white;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+
+  /* RODAPÉ */
+  .rodape {
+    background: #1a2035;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    padding: 30px;
+    font-size: 13px;
+    margin-top: 60px;
+  }
+
+  @media print {
+    body { background: white; }
+    .capa { min-height: auto; page-break-after: always; padding: 80px 60px; }
+    .secao { page-break-before: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== CAPA ===== -->
+<div class="capa">
+  <div class="snake-emoji">🐍</div>
+  <h1>Aprendendo Python</h1>
+  <p class="subtitulo">Do zero ao seu primeiro programa — de forma simples e prática</p>
+  <div class="badge">Apostila para Iniciantes • 2026</div>
+
+  <div class="indice">
+    <h3>Conteúdo</h3>
+    <ol>
+      <li><span class="num">01</span> O que é Python e por que aprender?</li>
+      <li><span class="num">02</span> Primeiro programa: Olá, Mundo!</li>
+      <li><span class="num">03</span> Variáveis e tipos de dados</li>
+      <li><span class="num">04</span> Operadores matemáticos e lógicos</li>
+      <li><span class="num">05</span> Entrada de dados pelo usuário</li>
+      <li><span class="num">06</span> Condicionais (if / elif / else)</li>
+      <li><span class="num">07</span> Repetição (for e while)</li>
+      <li><span class="num">08</span> Funções</li>
+      <li><span class="num">09</span> Listas</li>
+      <li><span class="num">10</span> Dicionários</li>
+      <li><span class="num">11</span> Exercícios finais</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ===== CAP 1 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">1</div>
+    <span class="emoji">💡</span>
+    <h2>O que é Python e por que aprender?</h2>
+  </div>
+
+  <p>Python é uma das linguagens de programação mais populares do mundo. Ela foi criada em 1991 pelo programador holandês <strong>Guido van Rossum</strong> e recebeu esse nome em homenagem ao grupo de comédia britânico <em>Monty Python</em>.</p>
+
+  <h3>Por que Python é tão amada?</h3>
+  <ul class="lista">
+    <li>✅ Tem uma sintaxe limpa — parece quase falar em inglês</li>
+    <li>✅ É fácil para iniciantes aprendem lógica de programação</li>
+    <li>✅ É poderosa o suficiente para criar sites, aplicativos, análise de dados e inteligência artificial</li>
+    <li>✅ Tem uma comunidade enorme — sempre tem alguém para ajudar</li>
+    <li>✅ É gratuita e funciona em Windows, Mac e Linux</li>
+  </ul>
+
+  <h3>Para que serve Python?</h3>
+  <table>
+    <thead>
+      <tr><th>Área</th><th>Exemplos do mundo real</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>🌐 Sites e aplicações web</td><td>Instagram, Pinterest e Spotify usam Python</td></tr>
+      <tr><td>🤖 Inteligência Artificial</td><td>Chatbots, reconhecimento de imagens</td></tr>
+      <tr><td>📊 Análise de dados</td><td>Gráficos, relatórios, Excel automatizado</td></tr>
+      <tr><td>🎮 Jogos</td><td>PyGame para criar jogos 2D</td></tr>
+      <tr><td>🔬 Ciência</td><td>Cálculos científicos e simulações</td></tr>
+      <tr><td>⚙️ Automação</td><td>Tarefas automáticas no computador</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Como instalar o Python?</h3>
+  <p>Acesse <strong>python.org/downloads</strong> e baixe a versão mais recente. Durante a instalação, marque a opção <strong>"Add Python to PATH"</strong> — isso é muito importante!</p>
+
+  <div class="caixa caixa-dica">
+    <strong>💡 Dica de iniciante:</strong> Você não precisa instalar nada agora para acompanhar esta apostila! Pode usar o <strong>python.org/shell</strong> diretamente no navegador para praticar.
+  </div>
+
+  <p>Depois de instalado, abra o terminal (ou o Prompt de Comando no Windows) e digite:</p>
+  <pre>python --version<span class="titulo-code">terminal</span></pre>
+  <p>Se aparecer algo como <code class="inline">Python 3.12.0</code>, está funcionando! 🎉</p>
+</div>
+
+<!-- ===== CAP 2 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">2</div>
+    <span class="emoji">👋</span>
+    <h2>Primeiro programa: Olá, Mundo!</h2>
+  </div>
+
+  <p>Todo programador começa pelo mesmo lugar: o famoso <strong>Olá, Mundo!</strong> É uma tradição mostrar que o programa está funcionando exibindo essa mensagem na tela.</p>
+
+  <p>Em Python, isso é incrivelmente simples:</p>
+
+  <pre><span class="py-fn">print</span>(<span class="py-str">"Olá, Mundo!"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <p>Quando você rodar esse código, verá no terminal:</p>
+  <pre><span class="py-out">Olá, Mundo!</span><span class="titulo-code">resultado</span></pre>
+
+  <h3>O que é print()?</h3>
+  <p>O <code class="inline">print()</code> é uma <strong>função</strong> — um comando que diz ao Python para <em>exibir algo na tela</em>. Tudo que você colocar entre os parênteses será mostrado.</p>
+
+  <pre><span class="py-fn">print</span>(<span class="py-str">"Meu nome é Python"</span>)
+<span class="py-fn">print</span>(<span class="py-str">"Eu sou uma linguagem incrível!"</span>)
+<span class="py-fn">print</span>(<span class="py-num">2026</span>)
+<span class="py-fn">print</span>(<span class="py-num">3.14</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Meu nome é Python
+Eu sou uma linguagem incrível!
+2026
+3.14</span><span class="titulo-code">resultado</span></pre>
+
+  <div class="caixa caixa-atencao">
+    <strong>⚠️ Atenção:</strong> Em Python, textos precisam estar entre aspas (<code class="inline">"assim"</code> ou <code class="inline">'assim'</code>). Números ficam sem aspas. Se errar isso, o programa vai reclamar!
+  </div>
+
+  <h3>Comentários — notas dentro do código</h3>
+  <p>Comentários são anotações que você escreve para <em>você mesmo</em> (ou para outros que lerem seu código). O Python ignora completamente tudo que vem depois do símbolo <code class="inline">#</code>.</p>
+
+  <pre><span class="py-cm"># Este é um comentário — o Python ignora esta linha</span>
+<span class="py-fn">print</span>(<span class="py-str">"Esta linha sim é executada"</span>)  <span class="py-cm"># comentário no final também funciona</span>
+<span class="titulo-code">Python</span></pre>
+
+  <div class="caixa caixa-dica">
+    <strong>💡 Bom hábito:</strong> Comente seu código! Daqui a 3 meses, quando você voltar a olhar, vai agradecer a si mesmo por ter escrito o que cada parte faz.
+  </div>
+</div>
+
+<!-- ===== CAP 3 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">3</div>
+    <span class="emoji">📦</span>
+    <h2>Variáveis e Tipos de Dados</h2>
+  </div>
+
+  <p>Imagine que seu programa precisa lembrar o nome de um aluno, a idade de uma pessoa ou o preço de um produto. Para isso, usamos <strong>variáveis</strong> — como se fossem caixinhas com etiquetas, onde você guarda uma informação e depois usa pelo nome da etiqueta.</p>
+
+  <pre><span class="py-var">nome</span> = <span class="py-str">"Maria"</span>
+<span class="py-var">idade</span> = <span class="py-num">25</span>
+<span class="py-var">altura</span> = <span class="py-num">1.68</span>
+<span class="py-var">estudante</span> = <span class="py-kw">True</span>
+
+<span class="py-fn">print</span>(<span class="py-var">nome</span>)
+<span class="py-fn">print</span>(<span class="py-var">idade</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Maria
+25</span><span class="titulo-code">resultado</span></pre>
+
+  <h3>Os 4 tipos básicos de dados</h3>
+  <table>
+    <thead>
+      <tr><th>Tipo</th><th>Nome em inglês</th><th>Exemplo</th><th>Para que serve</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Texto</td><td><code class="inline">str</code></td><td><code class="inline">"Olá"</code></td><td>Nomes, frases, palavras</td></tr>
+      <tr><td>Número inteiro</td><td><code class="inline">int</code></td><td><code class="inline">42</code></td><td>Idades, quantidades</td></tr>
+      <tr><td>Número decimal</td><td><code class="inline">float</code></td><td><code class="inline">3.14</code></td><td>Preços, medidas</td></tr>
+      <tr><td>Verdadeiro/Falso</td><td><code class="inline">bool</code></td><td><code class="inline">True</code> / <code class="inline">False</code></td><td>Sim/não, ativo/inativo</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Como criar variáveis</h3>
+  <pre><span class="py-cm"># string (texto) — usa aspas</span>
+<span class="py-var">cidade</span> = <span class="py-str">"São Paulo"</span>
+
+<span class="py-cm"># int (inteiro) — sem aspas, sem ponto</span>
+<span class="py-var">populacao</span> = <span class="py-num">12300000</span>
+
+<span class="py-cm"># float (decimal) — usa ponto, não vírgula!</span>
+<span class="py-var">temperatura</span> = <span class="py-num">28.5</span>
+
+<span class="py-cm"># bool (verdadeiro/falso) — maiúscula!</span>
+<span class="py-var">chuva</span> = <span class="py-kw">False</span>
+
+<span class="py-fn">print</span>(<span class="py-str">"Cidade:"</span>, <span class="py-var">cidade</span>)
+<span class="py-fn">print</span>(<span class="py-str">"Temperatura:"</span>, <span class="py-var">temperatura</span>, <span class="py-str">"°C"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Cidade: São Paulo
+Temperatura: 28.5 °C</span><span class="titulo-code">resultado</span></pre>
+
+  <h3>Regras para nomear variáveis</h3>
+  <ul class="lista">
+    <li>✅ Pode usar letras, números e underline: <code class="inline">minha_variavel</code>, <code class="inline">nome2</code></li>
+    <li>✅ Use nomes descritivos: <code class="inline">idade_do_usuario</code> é melhor que só <code class="inline">x</code></li>
+    <li>❌ Não pode começar com número: <code class="inline">2nome</code> é inválido</li>
+    <li>❌ Não pode ter espaços: <code class="inline">meu nome</code> é inválido</li>
+    <li>❌ Não pode ser uma palavra reservada do Python: <code class="inline">if</code>, <code class="inline">for</code>, <code class="inline">while</code>...</li>
+  </ul>
+
+  <h3>Descobrindo o tipo de uma variável</h3>
+  <pre><span class="py-var">x</span> = <span class="py-num">42</span>
+<span class="py-fn">print</span>(<span class="py-fn">type</span>(<span class="py-var">x</span>))   <span class="py-cm"># mostra: &lt;class 'int'&gt;</span>
+
+<span class="py-var">y</span> = <span class="py-str">"texto"</span>
+<span class="py-fn">print</span>(<span class="py-fn">type</span>(<span class="py-var">y</span>))   <span class="py-cm"># mostra: &lt;class 'str'&gt;</span>
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Juntando textos — concatenação e f-strings</h3>
+  <p>Há duas formas principais de combinar texto e variáveis no Python:</p>
+  <pre><span class="py-var">nome</span> = <span class="py-str">"Ana"</span>
+<span class="py-var">idade</span> = <span class="py-num">20</span>
+
+<span class="py-cm"># Jeito antigo — concatenação com +</span>
+<span class="py-fn">print</span>(<span class="py-str">"Olá, "</span> + <span class="py-var">nome</span> + <span class="py-str">"! Você tem "</span> + <span class="py-fn">str</span>(<span class="py-var">idade</span>) + <span class="py-str">" anos."</span>)
+
+<span class="py-cm"># Jeito moderno — f-string (muito mais fácil!)</span>
+<span class="py-fn">print</span>(<span class="py-str">f"Olá, <span class="py-op">{</span><span class="py-var">nome</span><span class="py-op">}</span>! Você tem <span class="py-op">{</span><span class="py-var">idade</span><span class="py-op">}</span> anos."</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Olá, Ana! Você tem 20 anos.
+Olá, Ana! Você tem 20 anos.</span><span class="titulo-code">resultado</span></pre>
+
+  <div class="caixa caixa-dica">
+    <strong>💡 Use f-strings!</strong> Coloque um <code class="inline">f</code> antes das aspas e use <code class="inline">{variavel}</code> dentro do texto. É muito mais simples e legível — é assim que os profissionais escrevem hoje.
+  </div>
+</div>
+
+<!-- ===== CAP 4 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">4</div>
+    <span class="emoji">🧮</span>
+    <h2>Operadores Matemáticos e Lógicos</h2>
+  </div>
+
+  <p>Python pode funcionar como uma calculadora poderosa. Além de somar e subtrair, ele tem operações especiais muito úteis.</p>
+
+  <h3>Operadores matemáticos</h3>
+  <table>
+    <thead>
+      <tr><th>Operador</th><th>Significado</th><th>Exemplo</th><th>Resultado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="inline">+</code></td><td>Adição</td><td><code class="inline">10 + 3</code></td><td>13</td></tr>
+      <tr><td><code class="inline">-</code></td><td>Subtração</td><td><code class="inline">10 - 3</code></td><td>7</td></tr>
+      <tr><td><code class="inline">*</code></td><td>Multiplicação</td><td><code class="inline">10 * 3</code></td><td>30</td></tr>
+      <tr><td><code class="inline">/</code></td><td>Divisão (com decimal)</td><td><code class="inline">10 / 3</code></td><td>3.3333...</td></tr>
+      <tr><td><code class="inline">//</code></td><td>Divisão inteira (sem resto)</td><td><code class="inline">10 // 3</code></td><td>3</td></tr>
+      <tr><td><code class="inline">%</code></td><td>Resto da divisão</td><td><code class="inline">10 % 3</code></td><td>1</td></tr>
+      <tr><td><code class="inline">**</code></td><td>Potência</td><td><code class="inline">2 ** 10</code></td><td>1024</td></tr>
+    </tbody>
+  </table>
+
+  <pre><span class="py-var">preco</span> = <span class="py-num">100</span>
+<span class="py-var">desconto</span> = <span class="py-num">15</span>
+<span class="py-var">preco_final</span> = <span class="py-var">preco</span> - <span class="py-var">desconto</span>
+
+<span class="py-fn">print</span>(<span class="py-str">f"Preço original: R$ <span class="py-op">{</span><span class="py-var">preco</span><span class="py-op">}</span>"</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Desconto: R$ <span class="py-op">{</span><span class="py-var">desconto</span><span class="py-op">}</span>"</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Você paga: R$ <span class="py-op">{</span><span class="py-var">preco_final</span><span class="py-op">}</span>"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Operadores de comparação</h3>
+  <p>Esses operadores comparam dois valores e devolvem <code class="inline">True</code> ou <code class="inline">False</code>:</p>
+  <table>
+    <thead>
+      <tr><th>Operador</th><th>Significado</th><th>Exemplo</th><th>Resultado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="inline">==</code></td><td>Igual a</td><td><code class="inline">5 == 5</code></td><td>True</td></tr>
+      <tr><td><code class="inline">!=</code></td><td>Diferente de</td><td><code class="inline">5 != 3</code></td><td>True</td></tr>
+      <tr><td><code class="inline">></code></td><td>Maior que</td><td><code class="inline">7 > 3</code></td><td>True</td></tr>
+      <tr><td><code class="inline"><</code></td><td>Menor que</td><td><code class="inline">2 < 10</code></td><td>True</td></tr>
+      <tr><td><code class="inline">>=</code></td><td>Maior ou igual</td><td><code class="inline">5 >= 5</code></td><td>True</td></tr>
+      <tr><td><code class="inline"><=</code></td><td>Menor ou igual</td><td><code class="inline">4 <= 3</code></td><td>False</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caixa caixa-atencao">
+    <strong>⚠️ Erro clássico:</strong> Não confunda <code class="inline">=</code> com <code class="inline">==</code>! O sinal de igual simples <code class="inline">=</code> é para <em>atribuir</em> um valor. O duplo <code class="inline">==</code> é para <em>comparar</em> dois valores.
+  </div>
+
+  <h3>Operadores lógicos</h3>
+  <table>
+    <thead>
+      <tr><th>Operador</th><th>Significado</th><th>Exemplo</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="inline">and</code></td><td>E (ambos precisam ser verdadeiros)</td><td><code class="inline">idade >= 18 and tem_carteira</code></td></tr>
+      <tr><td><code class="inline">or</code></td><td>Ou (pelo menos um é verdadeiro)</td><td><code class="inline">tem_dinheiro or tem_cartao</code></td></tr>
+      <tr><td><code class="inline">not</code></td><td>Não (inverte)</td><td><code class="inline">not chovendo</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== CAP 5 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">5</div>
+    <span class="emoji">⌨️</span>
+    <h2>Entrada de Dados pelo Usuário</h2>
+  </div>
+
+  <p>Até agora, os dados do programa eram definidos por você no código. Mas programas de verdade <strong>pedem informações ao usuário</strong>. Para isso, usamos a função <code class="inline">input()</code>.</p>
+
+  <pre><span class="py-var">nome</span> = <span class="py-fn">input</span>(<span class="py-str">"Qual é o seu nome? "</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Olá, <span class="py-op">{</span><span class="py-var">nome</span><span class="py-op">}</span>! Seja bem-vindo(a) ao Python!"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Qual é o seu nome? Maria
+Olá, Maria! Seja bem-vindo(a) ao Python!</span><span class="titulo-code">resultado</span></pre>
+
+  <h3>⚠️ Input sempre retorna texto!</h3>
+  <p>Um ponto muito importante: tudo que o usuário digita vem como <strong>texto</strong> (str), mesmo que seja um número. Se quiser fazer cálculos, precisa converter:</p>
+
+  <pre><span class="py-cm"># ERRADO — tentando somar sem converter</span>
+<span class="py-var">numero</span> = <span class="py-fn">input</span>(<span class="py-str">"Digite um número: "</span>)
+<span class="py-fn">print</span>(<span class="py-var">numero</span> + <span class="py-num">10</span>)  <span class="py-cm"># ERRO! não dá para somar texto com número</span>
+
+<span class="py-cm"># CORRETO — convertendo para inteiro com int()</span>
+<span class="py-var">numero</span> = <span class="py-fn">int</span>(<span class="py-fn">input</span>(<span class="py-str">"Digite um número: "</span>))
+<span class="py-fn">print</span>(<span class="py-var">numero</span> + <span class="py-num">10</span>)  <span class="py-cm"># funciona!</span>
+<span class="titulo-code">Python</span></pre>
+
+  <table>
+    <thead>
+      <tr><th>Função</th><th>Converte para</th><th>Exemplo</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="inline">int()</code></td><td>Número inteiro</td><td><code class="inline">int("42")</code> → <code class="inline">42</code></td></tr>
+      <tr><td><code class="inline">float()</code></td><td>Número decimal</td><td><code class="inline">float("3.14")</code> → <code class="inline">3.14</code></td></tr>
+      <tr><td><code class="inline">str()</code></td><td>Texto</td><td><code class="inline">str(42)</code> → <code class="inline">"42"</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Exemplo prático — calculadora de idade</h3>
+  <pre><span class="py-var">nome</span> = <span class="py-fn">input</span>(<span class="py-str">"Seu nome: "</span>)
+<span class="py-var">ano_nascimento</span> = <span class="py-fn">int</span>(<span class="py-fn">input</span>(<span class="py-str">"Ano de nascimento: "</span>))
+<span class="py-var">idade</span> = <span class="py-num">2026</span> - <span class="py-var">ano_nascimento</span>
+
+<span class="py-fn">print</span>(<span class="py-str">f"<span class="py-op">{</span><span class="py-var">nome</span><span class="py-op">}</span>, você tem aproximadamente <span class="py-op">{</span><span class="py-var">idade</span><span class="py-op">}</span> anos."</span>)
+<span class="titulo-code">Python</span></pre>
+</div>
+
+<!-- ===== CAP 6 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">6</div>
+    <span class="emoji">🔀</span>
+    <h2>Condicionais — if / elif / else</h2>
+  </div>
+
+  <p>A vida está cheia de condições: <em>se estiver chovendo, pego o guarda-chuva; senão, saio sem ele.</em> Em programação é igual — condicionais permitem que seu programa <strong>tome decisões</strong>.</p>
+
+  <h3>Estrutura básica</h3>
+  <pre><span class="py-kw">if</span> <span class="py-var">condicao</span>:
+    <span class="py-cm"># código executado se a condição for verdadeira</span>
+<span class="py-kw">elif</span> <span class="py-var">outra_condicao</span>:
+    <span class="py-cm"># executado se a primeira for falsa, mas esta for verdadeira</span>
+<span class="py-kw">else</span>:
+    <span class="py-cm"># executado se nenhuma condição anterior for verdadeira</span>
+<span class="titulo-code">Python</span></pre>
+
+  <div class="caixa caixa-atencao">
+    <strong>⚠️ Indentação é OBRIGATÓRIA!</strong> Em Python, o código dentro de um <code class="inline">if</code> precisa estar <em>recuado</em> (com espaços ou tab). Use 4 espaços — é o padrão. Se não indentar, o Python vai reclamar!
+  </div>
+
+  <h3>Exemplo 1 — verificar maioridade</h3>
+  <pre><span class="py-var">idade</span> = <span class="py-fn">int</span>(<span class="py-fn">input</span>(<span class="py-str">"Quantos anos você tem? "</span>))
+
+<span class="py-kw">if</span> <span class="py-var">idade</span> >= <span class="py-num">18</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"Você é maior de idade! ✅"</span>)
+<span class="py-kw">else</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"Você é menor de idade. ❌"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Exemplo 2 — classificação escolar</h3>
+  <pre><span class="py-var">nota</span> = <span class="py-fn">float</span>(<span class="py-fn">input</span>(<span class="py-str">"Digite sua nota (0 a 10): "</span>))
+
+<span class="py-kw">if</span> <span class="py-var">nota</span> >= <span class="py-num">9</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"🏆 Excelente!"</span>)
+<span class="py-kw">elif</span> <span class="py-var">nota</span> >= <span class="py-num">7</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"✅ Aprovado(a)!"</span>)
+<span class="py-kw">elif</span> <span class="py-var">nota</span> >= <span class="py-num">5</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"⚠️ Recuperação..."</span>)
+<span class="py-kw">else</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"❌ Reprovado(a)."</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Condições combinadas</h3>
+  <pre><span class="py-var">temperatura</span> = <span class="py-num">35</span>
+<span class="py-var">tem_sol</span> = <span class="py-kw">True</span>
+
+<span class="py-kw">if</span> <span class="py-var">temperatura</span> > <span class="py-num">30</span> <span class="py-kw">and</span> <span class="py-var">tem_sol</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"Dia perfeito para a praia! 🏖️"</span>)
+<span class="py-kw">elif</span> <span class="py-var">temperatura</span> > <span class="py-num">30</span> <span class="py-kw">and</span> <span class="py-kw">not</span> <span class="py-var">tem_sol</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"Calor, mas sem sol. Pode sair! ☁️"</span>)
+<span class="py-kw">else</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"Melhor ficar em casa. 🏠"</span>)
+<span class="titulo-code">Python</span></pre>
+</div>
+
+<!-- ===== CAP 7 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">7</div>
+    <span class="emoji">🔄</span>
+    <h2>Repetição — for e while</h2>
+  </div>
+
+  <p>Imagine pedir para um aluno copiar uma frase 100 vezes. Você não escreveria o <code class="inline">print()</code> 100 vezes no código — usaria um <strong>loop</strong> (laço de repetição).</p>
+
+  <h3>O loop for — repetição com contagem</h3>
+  <p>Use o <code class="inline">for</code> quando você sabe <strong>quantas vezes</strong> quer repetir algo:</p>
+
+  <pre><span class="py-kw">for</span> <span class="py-var">i</span> <span class="py-kw">in</span> <span class="py-fn">range</span>(<span class="py-num">5</span>):
+    <span class="py-fn">print</span>(<span class="py-str">f"Repetição número <span class="py-op">{</span><span class="py-var">i</span><span class="py-op">}</span>"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Repetição número 0
+Repetição número 1
+Repetição número 2
+Repetição número 3
+Repetição número 4</span><span class="titulo-code">resultado</span></pre>
+
+  <div class="caixa caixa-info">
+    <strong>ℹ️ range():</strong> O <code class="inline">range(5)</code> gera os números 0, 1, 2, 3, 4 — começa no 0 e para antes do 5. Use <code class="inline">range(1, 6)</code> para ir de 1 a 5. Use <code class="inline">range(0, 10, 2)</code> para ir de 2 em 2.
+  </div>
+
+  <h3>Percorrendo uma lista com for</h3>
+  <pre><span class="py-var">frutas</span> = [<span class="py-str">"maçã"</span>, <span class="py-str">"banana"</span>, <span class="py-str">"laranja"</span>, <span class="py-str">"uva"</span>]
+
+<span class="py-kw">for</span> <span class="py-var">fruta</span> <span class="py-kw">in</span> <span class="py-var">frutas</span>:
+    <span class="py-fn">print</span>(<span class="py-str">f"🍎 <span class="py-op">{</span><span class="py-var">fruta</span><span class="py-op">}</span>"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">🍎 maçã
+🍎 banana
+🍎 laranja
+🍎 uva</span><span class="titulo-code">resultado</span></pre>
+
+  <h3>O loop while — repetição com condição</h3>
+  <p>Use o <code class="inline">while</code> quando quer repetir <strong>enquanto uma condição for verdadeira</strong>:</p>
+
+  <pre><span class="py-var">tentativas</span> = <span class="py-num">0</span>
+<span class="py-var">senha_correta</span> = <span class="py-str">"python123"</span>
+
+<span class="py-kw">while</span> <span class="py-var">tentativas</span> < <span class="py-num">3</span>:
+    <span class="py-var">senha</span> = <span class="py-fn">input</span>(<span class="py-str">"Digite a senha: "</span>)
+    <span class="py-kw">if</span> <span class="py-var">senha</span> == <span class="py-var">senha_correta</span>:
+        <span class="py-fn">print</span>(<span class="py-str">"✅ Acesso liberado!"</span>)
+        <span class="py-kw">break</span>  <span class="py-cm"># sai do loop imediatamente</span>
+    <span class="py-kw">else</span>:
+        <span class="py-var">tentativas</span> += <span class="py-num">1</span>
+        <span class="py-fn">print</span>(<span class="py-str">f"❌ Senha errada. Tentativa <span class="py-op">{</span><span class="py-var">tentativas</span><span class="py-op">}</span>/3"</span>)
+
+<span class="py-kw">if</span> <span class="py-var">tentativas</span> == <span class="py-num">3</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"🔒 Acesso bloqueado."</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <div class="caixa caixa-atencao">
+    <strong>⚠️ Cuidado com loop infinito!</strong> Se a condição do <code class="inline">while</code> nunca ficar falsa, o programa trava. Sempre certifique-se de que a condição vai mudar em algum momento, ou use <code class="inline">break</code> para sair.
+  </div>
+
+  <h3>Palavras especiais dentro de loops</h3>
+  <table>
+    <thead>
+      <tr><th>Palavra</th><th>O que faz</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="inline">break</code></td><td>Para o loop imediatamente</td></tr>
+      <tr><td><code class="inline">continue</code></td><td>Pula para a próxima repetição</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== CAP 8 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">8</div>
+    <span class="emoji">⚙️</span>
+    <h2>Funções</h2>
+  </div>
+
+  <p>Imagine que você precisa calcular o dobro de um número várias vezes no seu programa. Em vez de escrever o mesmo código repetido, você cria uma <strong>função</strong> — um bloco de código reutilizável com um nome.</p>
+
+  <h3>Criando sua primeira função</h3>
+  <pre><span class="py-kw">def</span> <span class="py-fn">saudacao</span>():
+    <span class="py-fn">print</span>(<span class="py-str">"Olá! Seja bem-vindo(a)!"</span>)
+    <span class="py-fn">print</span>(<span class="py-str">"Estou feliz que você está aprendendo Python 🐍"</span>)
+
+<span class="py-cm"># Chamando (usando) a função</span>
+<span class="py-fn">saudacao</span>()
+<span class="py-fn">saudacao</span>()  <span class="py-cm"># pode chamar quantas vezes quiser!</span>
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Funções com parâmetros</h3>
+  <p>Parâmetros são informações que você <em>passa</em> para a função:</p>
+  <pre><span class="py-kw">def</span> <span class="py-fn">saudacao_personalizada</span>(<span class="py-var">nome</span>):
+    <span class="py-fn">print</span>(<span class="py-str">f"Olá, <span class="py-op">{</span><span class="py-var">nome</span><span class="py-op">}</span>! Bem-vindo(a)! 👋"</span>)
+
+<span class="py-fn">saudacao_personalizada</span>(<span class="py-str">"Maria"</span>)
+<span class="py-fn">saudacao_personalizada</span>(<span class="py-str">"João"</span>)
+<span class="py-fn">saudacao_personalizada</span>(<span class="py-str">"Ana"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Olá, Maria! Bem-vindo(a)! 👋
+Olá, João! Bem-vindo(a)! 👋
+Olá, Ana! Bem-vindo(a)! 👋</span><span class="titulo-code">resultado</span></pre>
+
+  <h3>Funções que devolvem um resultado — return</h3>
+  <pre><span class="py-kw">def</span> <span class="py-fn">calcular_media</span>(<span class="py-var">nota1</span>, <span class="py-var">nota2</span>, <span class="py-var">nota3</span>):
+    <span class="py-var">media</span> = (<span class="py-var">nota1</span> + <span class="py-var">nota2</span> + <span class="py-var">nota3</span>) / <span class="py-num">3</span>
+    <span class="py-kw">return</span> <span class="py-var">media</span>
+
+<span class="py-cm"># Usando a função</span>
+<span class="py-var">resultado</span> = <span class="py-fn">calcular_media</span>(<span class="py-num">8</span>, <span class="py-num">7.5</span>, <span class="py-num">9</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Sua média é: <span class="py-op">{</span><span class="py-var">resultado</span><span class="py-op">:.1f</span><span class="py-op">}</span>"</span>)  <span class="py-cm"># .1f = 1 casa decimal</span>
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Sua média é: 8.2</span><span class="titulo-code">resultado</span></pre>
+
+  <div class="caixa caixa-dica">
+    <strong>💡 Regra de ouro:</strong> Se um bloco de código se repete mais de 2 vezes, <em>crie uma função</em>. Código bem organizado em funções é muito mais fácil de corrigir e entender.
+  </div>
+
+  <h3>Parâmetros com valor padrão</h3>
+  <pre><span class="py-kw">def</span> <span class="py-fn">apresentar</span>(<span class="py-var">nome</span>, <span class="py-var">cidade</span>=<span class="py-str">"Brasil"</span>):
+    <span class="py-fn">print</span>(<span class="py-str">f"Olá! Eu sou <span class="py-op">{</span><span class="py-var">nome</span><span class="py-op">}</span>, de <span class="py-op">{</span><span class="py-var">cidade</span><span class="py-op">}</span>."</span>)
+
+<span class="py-fn">apresentar</span>(<span class="py-str">"Carlos"</span>)                   <span class="py-cm"># usa o padrão</span>
+<span class="py-fn">apresentar</span>(<span class="py-str">"Ana"</span>, <span class="py-str">"São Paulo"</span>)      <span class="py-cm"># substitui o padrão</span>
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Olá! Eu sou Carlos, de Brasil.
+Olá! Eu sou Ana, de São Paulo.</span><span class="titulo-code">resultado</span></pre>
+</div>
+
+<!-- ===== CAP 9 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">9</div>
+    <span class="emoji">📋</span>
+    <h2>Listas</h2>
+  </div>
+
+  <p>Uma lista é uma coleção de itens organizados em <strong>sequência</strong>. Imagine uma lista de compras, uma turma de alunos, os filmes que você quer assistir — todos são exemplos de listas.</p>
+
+  <pre><span class="py-cm"># Criando uma lista</span>
+<span class="py-var">alunos</span> = [<span class="py-str">"Maria"</span>, <span class="py-str">"João"</span>, <span class="py-str">"Ana"</span>, <span class="py-str">"Pedro"</span>]
+
+<span class="py-fn">print</span>(<span class="py-var">alunos</span>)            <span class="py-cm"># lista inteira</span>
+<span class="py-fn">print</span>(<span class="py-var">alunos</span>[<span class="py-num">0</span>])         <span class="py-cm"># primeiro item (índice 0)</span>
+<span class="py-fn">print</span>(<span class="py-var">alunos</span>[<span class="py-num">-1</span>])        <span class="py-cm"># último item</span>
+<span class="py-fn">print</span>(<span class="py-fn">len</span>(<span class="py-var">alunos</span>))       <span class="py-cm"># quantidade de itens</span>
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">['Maria', 'João', 'Ana', 'Pedro']
+Maria
+Pedro
+4</span><span class="titulo-code">resultado</span></pre>
+
+  <div class="caixa caixa-info">
+    <strong>ℹ️ Índices começam em 0!</strong> O primeiro item está na posição 0, o segundo na posição 1, e assim por diante. Índices negativos contam do fim: -1 é o último, -2 é o penúltimo.
+  </div>
+
+  <h3>Modificando listas</h3>
+  <pre><span class="py-var">frutas</span> = [<span class="py-str">"maçã"</span>, <span class="py-str">"banana"</span>]
+
+<span class="py-var">frutas</span>.<span class="py-fn">append</span>(<span class="py-str">"uva"</span>)       <span class="py-cm"># adiciona no final</span>
+<span class="py-fn">print</span>(<span class="py-var">frutas</span>)  <span class="py-cm"># ['maçã', 'banana', 'uva']</span>
+
+<span class="py-var">frutas</span>.<span class="py-fn">remove</span>(<span class="py-str">"banana"</span>)    <span class="py-cm"># remove pelo valor</span>
+<span class="py-fn">print</span>(<span class="py-var">frutas</span>)  <span class="py-cm"># ['maçã', 'uva']</span>
+
+<span class="py-var">frutas</span>[<span class="py-num">0</span>] = <span class="py-str">"manga"</span>         <span class="py-cm"># altera o primeiro item</span>
+<span class="py-fn">print</span>(<span class="py-var">frutas</span>)  <span class="py-cm"># ['manga', 'uva']</span>
+
+<span class="py-var">frutas</span>.<span class="py-fn">sort</span>()               <span class="py-cm"># ordena em ordem alfabética</span>
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Percorrendo uma lista</h3>
+  <pre><span class="py-var">notas</span> = [<span class="py-num">8.5</span>, <span class="py-num">7.0</span>, <span class="py-num">9.2</span>, <span class="py-num">6.8</span>]
+
+<span class="py-var">soma</span> = <span class="py-num">0</span>
+<span class="py-kw">for</span> <span class="py-var">nota</span> <span class="py-kw">in</span> <span class="py-var">notas</span>:
+    <span class="py-var">soma</span> += <span class="py-var">nota</span>
+
+<span class="py-var">media</span> = <span class="py-var">soma</span> / <span class="py-fn">len</span>(<span class="py-var">notas</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Média da turma: <span class="py-op">{</span><span class="py-var">media</span><span class="py-op">:.1f</span><span class="py-op">}</span>"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">Média da turma: 7.9</span><span class="titulo-code">resultado</span></pre>
+
+  <h3>Verificando se um item está na lista</h3>
+  <pre><span class="py-var">alunos</span> = [<span class="py-str">"Maria"</span>, <span class="py-str">"João"</span>, <span class="py-str">"Ana"</span>]
+
+<span class="py-kw">if</span> <span class="py-str">"João"</span> <span class="py-kw">in</span> <span class="py-var">alunos</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"João está na turma!"</span>)
+<span class="py-kw">else</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"João não está na turma."</span>)
+<span class="titulo-code">Python</span></pre>
+</div>
+
+<!-- ===== CAP 10 ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">10</div>
+    <span class="emoji">📚</span>
+    <h2>Dicionários</h2>
+  </div>
+
+  <p>Enquanto listas guardam itens em <em>sequência</em> (posição 0, 1, 2...), dicionários guardam informações com <strong>chave e valor</strong> — como um dicionário de palavras onde cada palavra tem sua definição.</p>
+
+  <pre><span class="py-cm"># Criando um dicionário</span>
+<span class="py-var">aluno</span> = {
+    <span class="py-str">"nome"</span>: <span class="py-str">"Maria"</span>,
+    <span class="py-str">"idade"</span>: <span class="py-num">17</span>,
+    <span class="py-str">"nota"</span>: <span class="py-num">8.5</span>,
+    <span class="py-str">"aprovado"</span>: <span class="py-kw">True</span>
+}
+
+<span class="py-fn">print</span>(<span class="py-var">aluno</span>[<span class="py-str">"nome"</span>])     <span class="py-cm"># Maria</span>
+<span class="py-fn">print</span>(<span class="py-var">aluno</span>[<span class="py-str">"nota"</span>])     <span class="py-cm"># 8.5</span>
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Adicionando e modificando dados</h3>
+  <pre><span class="py-var">aluno</span>[<span class="py-str">"email"</span>] = <span class="py-str">"maria@escola.com"</span>   <span class="py-cm"># adiciona nova chave</span>
+<span class="py-var">aluno</span>[<span class="py-str">"nota"</span>] = <span class="py-num">9.0</span>                    <span class="py-cm"># atualiza valor existente</span>
+
+<span class="py-fn">print</span>(<span class="py-var">aluno</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Verificando se uma chave existe</h3>
+  <pre><span class="py-kw">if</span> <span class="py-str">"email"</span> <span class="py-kw">in</span> <span class="py-var">aluno</span>:
+    <span class="py-fn">print</span>(<span class="py-str">f"E-mail: <span class="py-op">{</span><span class="py-var">aluno</span>[<span class="py-str">'email'</span>]<span class="py-op">}</span>"</span>)
+<span class="py-kw">else</span>:
+    <span class="py-fn">print</span>(<span class="py-str">"E-mail não cadastrado."</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <h3>Lista de dicionários — cadastro de alunos</h3>
+  <pre><span class="py-var">turma</span> = [
+    {<span class="py-str">"nome"</span>: <span class="py-str">"Maria"</span>, <span class="py-str">"nota"</span>: <span class="py-num">8.5</span>},
+    {<span class="py-str">"nome"</span>: <span class="py-str">"João"</span>,  <span class="py-str">"nota"</span>: <span class="py-num">6.0</span>},
+    {<span class="py-str">"nome"</span>: <span class="py-str">"Ana"</span>,   <span class="py-str">"nota"</span>: <span class="py-num">9.2</span>},
+]
+
+<span class="py-fn">print</span>(<span class="py-str">"=== Boletim da Turma ==="</span>)
+<span class="py-kw">for</span> <span class="py-var">aluno</span> <span class="py-kw">in</span> <span class="py-var">turma</span>:
+    <span class="py-var">status</span> = <span class="py-str">"✅ Aprovado"</span> <span class="py-kw">if</span> <span class="py-var">aluno</span>[<span class="py-str">"nota"</span>] >= <span class="py-num">7</span> <span class="py-kw">else</span> <span class="py-str">"❌ Reprovado"</span>
+    <span class="py-fn">print</span>(<span class="py-str">f"<span class="py-op">{</span><span class="py-var">aluno</span>[<span class="py-str">'nome'</span>]<span class="py-op">}</span>: <span class="py-op">{</span><span class="py-var">aluno</span>[<span class="py-str">'nota'</span>]<span class="py-op">}</span> — <span class="py-op">{</span><span class="py-var">status</span><span class="py-op">}</span>"</span>)
+<span class="titulo-code">Python</span></pre>
+
+  <pre><span class="py-out">=== Boletim da Turma ===
+Maria: 8.5 — ✅ Aprovado
+João: 6.0 — ❌ Reprovado
+Ana: 9.2 — ✅ Aprovado</span><span class="titulo-code">resultado</span></pre>
+</div>
+
+<!-- ===== CAP 11 — EXERCÍCIOS ===== -->
+<div class="secao">
+  <div class="capitulo-header">
+    <div class="num">11</div>
+    <span class="emoji">🏋️</span>
+    <h2>Exercícios Práticos</h2>
+  </div>
+
+  <p>A melhor forma de aprender a programar é <strong>praticando</strong>. Tente resolver cada exercício abaixo antes de ver a solução. Não tem resposta errada — o que importa é tentar!</p>
+
+  <div class="exercicio">
+    <h4>🥉 Exercício 1 — Calculadora de IMC</h4>
+    <p>Crie um programa que:</p>
+    <ol>
+      <li>Peça o nome, o peso (kg) e a altura (m) do usuário</li>
+      <li>Calcule o IMC: <code>peso / (altura ** 2)</code></li>
+      <li>Mostre a classificação: abaixo do peso (&lt;18.5), normal (18.5–24.9), sobrepeso (25–29.9), obesidade (≥30)</li>
+    </ol>
+  </div>
+
+  <pre><span class="py-var">nome</span> = <span class="py-fn">input</span>(<span class="py-str">"Seu nome: "</span>)
+<span class="py-var">peso</span> = <span class="py-fn">float</span>(<span class="py-fn">input</span>(<span class="py-str">"Peso (kg): "</span>))
+<span class="py-var">altura</span> = <span class="py-fn">float</span>(<span class="py-fn">input</span>(<span class="py-str">"Altura (m): "</span>))
+
+<span class="py-var">imc</span> = <span class="py-var">peso</span> / (<span class="py-var">altura</span> ** <span class="py-num">2</span>)
+
+<span class="py-kw">if</span> <span class="py-var">imc</span> < <span class="py-num">18.5</span>:
+    <span class="py-var">classificacao</span> = <span class="py-str">"Abaixo do peso"</span>
+<span class="py-kw">elif</span> <span class="py-var">imc</span> < <span class="py-num">25</span>:
+    <span class="py-var">classificacao</span> = <span class="py-str">"Peso normal ✅"</span>
+<span class="py-kw">elif</span> <span class="py-var">imc</span> < <span class="py-num">30</span>:
+    <span class="py-var">classificacao</span> = <span class="py-str">"Sobrepeso"</span>
+<span class="py-kw">else</span>:
+    <span class="py-var">classificacao</span> = <span class="py-str">"Obesidade"</span>
+
+<span class="py-fn">print</span>(<span class="py-str">f"\n<span class="py-op">{</span><span class="py-var">nome</span><span class="py-op">}</span>, seu IMC é <span class="py-op">{</span><span class="py-var">imc</span><span class="py-op">:.1f</span><span class="py-op">}</span>: <span class="py-op">{</span><span class="py-var">classificacao</span><span class="py-op">}</span>"</span>)
+<span class="titulo-code">Solução</span></pre>
+
+  <div class="exercicio">
+    <h4>🥈 Exercício 2 — Tabuada</h4>
+    <p>Crie um programa que peça um número e mostre a tabuada completa desse número (de 1 a 10).</p>
+  </div>
+
+  <pre><span class="py-var">numero</span> = <span class="py-fn">int</span>(<span class="py-fn">input</span>(<span class="py-str">"Digite um número para ver a tabuada: "</span>))
+
+<span class="py-fn">print</span>(<span class="py-str">f"\n=== Tabuada do <span class="py-op">{</span><span class="py-var">numero</span><span class="py-op">}</span> ==="</span>)
+<span class="py-kw">for</span> <span class="py-var">i</span> <span class="py-kw">in</span> <span class="py-fn">range</span>(<span class="py-num">1</span>, <span class="py-num">11</span>):
+    <span class="py-var">resultado</span> = <span class="py-var">numero</span> * <span class="py-var">i</span>
+    <span class="py-fn">print</span>(<span class="py-str">f"<span class="py-op">{</span><span class="py-var">numero</span><span class="py-op">}</span> × <span class="py-op">{</span><span class="py-var">i</span><span class="py-op">}</span> = <span class="py-op">{</span><span class="py-var">resultado</span><span class="py-op">}</span>"</span>)
+<span class="titulo-code">Solução</span></pre>
+
+  <div class="exercicio">
+    <h4>🥇 Exercício 3 — Jogo de Adivinhação</h4>
+    <p>Crie um jogo onde:</p>
+    <ol>
+      <li>O programa "pensa" em um número secreto (pode começar com um fixo, como 42)</li>
+      <li>O usuário tem 5 tentativas para adivinhar</li>
+      <li>A cada tentativa, o programa diz se o número é maior ou menor</li>
+      <li>Se acertar, parabeniza. Se errar todas, revela a resposta.</li>
+    </ol>
+  </div>
+
+  <pre><span class="py-var">numero_secreto</span> = <span class="py-num">42</span>
+<span class="py-var">tentativas_maximas</span> = <span class="py-num">5</span>
+<span class="py-var">acertou</span> = <span class="py-kw">False</span>
+
+<span class="py-fn">print</span>(<span class="py-str">"🎮 Jogo de Adivinhação!"</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Você tem <span class="py-op">{</span><span class="py-var">tentativas_maximas</span><span class="py-op">}</span> tentativas para adivinhar o número (entre 1 e 100)."</span>)
+
+<span class="py-kw">for</span> <span class="py-var">tentativa</span> <span class="py-kw">in</span> <span class="py-fn">range</span>(<span class="py-num">1</span>, <span class="py-var">tentativas_maximas</span> + <span class="py-num">1</span>):
+    <span class="py-var">palpite</span> = <span class="py-fn">int</span>(<span class="py-fn">input</span>(<span class="py-str">f"\nTentativa <span class="py-op">{</span><span class="py-var">tentativa</span><span class="py-op">}</span>/<span class="py-op">{</span><span class="py-var">tentativas_maximas</span><span class="py-op">}</span>: "</span>))
+
+    <span class="py-kw">if</span> <span class="py-var">palpite</span> == <span class="py-var">numero_secreto</span>:
+        <span class="py-fn">print</span>(<span class="py-str">f"🎉 Parabéns! Você acertou em <span class="py-op">{</span><span class="py-var">tentativa</span><span class="py-op">}</span> tentativa(s)!"</span>)
+        <span class="py-var">acertou</span> = <span class="py-kw">True</span>
+        <span class="py-kw">break</span>
+    <span class="py-kw">elif</span> <span class="py-var">palpite</span> < <span class="py-var">numero_secreto</span>:
+        <span class="py-fn">print</span>(<span class="py-str">"📈 O número é MAIOR!"</span>)
+    <span class="py-kw">else</span>:
+        <span class="py-fn">print</span>(<span class="py-str">"📉 O número é MENOR!"</span>)
+
+<span class="py-kw">if</span> <span class="py-kw">not</span> <span class="py-var">acertou</span>:
+    <span class="py-fn">print</span>(<span class="py-str">f"\n😅 Acabaram as tentativas! O número era <span class="py-op">{</span><span class="py-var">numero_secreto</span><span class="py-op">}</span>."</span>)
+<span class="titulo-code">Solução</span></pre>
+
+  <div class="divisor"></div>
+
+  <div class="caixa caixa-sucesso">
+    <strong>🎓 Parabéns! Você chegou ao fim desta apostila!</strong><br><br>
+    Você aprendeu os fundamentos essenciais do Python: variáveis, tipos de dados, operadores, entrada de dados, condicionais, loops, funções, listas e dicionários. Com isso, você já consegue criar programas reais!<br><br>
+    <strong>Próximos passos sugeridos:</strong><br>
+    ✅ Pratique os exercícios e invente variações<br>
+    ✅ Explore a biblioteca <strong>random</strong> para gerar números aleatórios<br>
+    ✅ Aprenda a ler e escrever arquivos com Python<br>
+    ✅ Conheça a biblioteca <strong>Pandas</strong> para trabalhar com dados<br>
+    ✅ Explore o <strong>Flask</strong> ou <strong>Django</strong> para criar sites
+  </div>
+</div>
+
+<div class="rodape">
+  🐍 Apostila de Python para Iniciantes &nbsp;•&nbsp; Feita com carinho para você &nbsp;•&nbsp; 2026
+</div>
+
+</body>
+</html>

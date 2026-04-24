@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossário Literal - Python Básico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            overflow: hidden;
+        }
+        
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Category Badges */
+        .badge-io { background-color: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
+        .badge-types { background-color: #f5f3ff; color: #8b5cf6; border: 1px solid #ddd6fe; }
+        .badge-control { background-color: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
+        .badge-collections { background-color: #f0fdf4; color: #22c55e; border: 1px solid #bbf7d0; }
+        .badge-functions { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+        .badge-sql { background-color: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+
+        .term-item {
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        .term-item:hover {
+            background-color: #f1f5f9;
+        }
+        .term-item.active {
+            background-color: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        /* Syntax Highlighting */
+        .kw { color: #818cf8; font-weight: 500; } /* Keyword */
+        .func { color: #0ea5e9; font-weight: 600; } /* Function */
+        .str { color: #f59e0b; } /* String */
+        .num { color: #10b981; } /* Number */
+        .cmt { color: #94a3b8; font-style: italic; } /* Comment */
+        .op { color: #ec4899; } /* Operator */
+        .sql { color: #c026d3; font-weight: 600; } /* SQL */
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row text-slate-800">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-20">
+        <h1 class="font-bold text-lg">Guia Zero Complicação</h1>
+        <button id="mobile-menu-btn" class="p-2 bg-slate-800 rounded-lg">☰ Menu</button>
+    </div>
+
+    <!-- Sidebar (Terms List) -->
+    <aside id="sidebar" class="w-full md:w-1/3 lg:w-1/4 bg-white border-r border-slate-200 h-[40vh] md:h-screen flex flex-col absolute md:relative z-10 transition-transform transform -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
+        
+        <div class="p-6 border-b border-slate-100 bg-slate-50 hidden md:block">
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">O Tradutor de Código</h1>
+            <p class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">Linguagem humana, direta e óbvia</p>
+        </div>
+
+        <div class="p-4 border-b border-slate-100">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                <input type="text" id="search-input" placeholder="Buscar comando..." class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none">
+            </div>
+            
+            <div class="flex gap-2 mt-3 overflow-x-auto pb-1" id="category-filters">
+                <button onclick="filterCategory('Todos')" class="filter-btn active text-xs font-semibold px-3 py-1 bg-slate-800 text-white rounded-full whitespace-nowrap">Todos</button>
+                <button onclick="filterCategory('Comunicação')" class="filter-btn text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 whitespace-nowrap">Comunicação</button>
+                <button onclick="filterCategory('Tipos de Informação')" class="filter-btn text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 whitespace-nowrap">Informações</button>
+                <button onclick="filterCategory('Decisões')" class="filter-btn text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 whitespace-nowrap">Decisões</button>
+                <button onclick="filterCategory('Organização')" class="filter-btn text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 whitespace-nowrap">Organização</button>
+                <button onclick="filterCategory('Banco de Dados')" class="filter-btn text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 whitespace-nowrap">Gavetas (SQL)</button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto" id="terms-list">
+            <!-- List injected via JS -->
+        </div>
+    </aside>
+
+    <!-- Main Content Area (Definition Display) -->
+    <main class="flex-1 bg-slate-50 h-[60vh] md:h-screen overflow-y-auto p-4 md:p-10 relative">
+        <div id="mobile-overlay" class="hidden md:hidden fixed inset-0 bg-black/20 z-0"></div>
+        
+        <div id="content-display" class="max-w-3xl mx-auto h-full flex flex-col justify-center fade-in">
+            <!-- Default Welcome State -->
+            <div class="text-center py-20">
+                <div class="text-6xl mb-4">💡</div>
+                <h2 class="text-2xl font-bold text-slate-700">Bem-vindo ao Tradutor de Código</h2>
+                <p class="text-slate-500 mt-2 text-lg">Aqui a parede branca é branca porque foi pintada de branco.</p>
+                <p class="text-slate-400 mt-1 text-sm">Selecione um comando ao lado para entender a lógica óbvia por trás dele.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DATABASE OF TERMS (REESCRITO COM EXPLICAÇÕES ÓBVIAS) ---
+        const dictionaryData = [
+            {
+                id: 'print',
+                termo: 'print()',
+                categoria: 'Comunicação',
+                icone: '📢',
+                oQueE: 'É o comando para o computador escrever coisas na tela para você ler.',
+                paraQueServe: 'O computador não tem voz e faz contas muito rápido dentro da memória escondido. O print serve para ele te mostrar o resultado.',
+                analogia: 'A parede tem cor porque foi pintada. O texto aparece no seu monitor porque você mandou o computador "pintar" a frase lá com o comando print.',
+                codigo: `<span class="cmt"># Manda o computador mostrar a palavra Oi na tela</span>\n<span class="func">print</span>(<span class="str">"Oi!"</span>)`
+            },
+            {
+                id: 'input',
+                termo: 'input()',
+                categoria: 'Comunicação',
+                icone: '⌨️',
+                oQueE: 'É o computador parando de trabalhar e esperando você digitar alguma coisa.',
+                paraQueServe: 'O computador não lê a sua mente. Ele precisa do seu nome ou da sua senha para continuar, então ele abre uma caixa de texto e espera você responder.',
+                analogia: 'É igual chegar num balcão de atendimento e o atendente dizer: "Preencha o seu nome neste formulário em branco, por favor".',
+                codigo: `<span class="cmt"># O computador para e espera você digitar.</span>\n<span class="cmt"># O que você digitar fica guardado na caixa "nome"</span>\nnome <span class="op">=</span> <span class="func">input</span>(<span class="str">"Qual é o seu nome? "</span>)`
+            },
+            {
+                id: 'int',
+                termo: 'Inteiro (int)',
+                categoria: 'Tipos de Informação',
+                icone: '1️⃣',
+                oQueE: 'São números inteiros. Sem vírgula, sem ponto, sem quebrar.',
+                paraQueServe: 'A gente usa para coisas que só existem por inteiro. Quantidade de pessoas, número de vidas num jogo, idade. Ninguém tem "meio" irmão.',
+                analogia: 'É como contar pessoas na sala. Tem 1 pessoa, 2 pessoas, 3 pessoas. Você nunca vai ver 2,5 pessoas sentadas num sofá.',
+                codigo: `<span class="cmt"># Quantidade exata, sem vírgula</span>\nfilhos <span class="op">=</span> <span class="num">2</span>\nanos <span class="op">=</span> <span class="num">35</span>`
+            },
+            {
+                id: 'float',
+                termo: 'Decimal (float)',
+                categoria: 'Tipos de Informação',
+                icone: '📏',
+                oQueE: 'São números com casas decimais (números quebrados). Em Python a gente usa PONTO e não VÍRGULA.',
+                paraQueServe: 'A gente usa para dinheiro, peso, altura e notas de prova. Coisas que exigem precisão além do número inteiro.',
+                analogia: 'O café na padaria não custa exatamente 5 Reais nem 6 Reais. Ele custa R$ 5.50 (cinco e cinquenta).',
+                codigo: `preco <span class="op">=</span> <span class="num">15.90</span>\naltura <span class="op">=</span> <span class="num">1.75</span>`
+            },
+            {
+                id: 'str',
+                termo: 'Texto (string)',
+                categoria: 'Tipos de Informação',
+                icone: '🔤',
+                oQueE: 'É puro texto. Palavras. O computador só entende que é um texto porque você coloca aspas (") em volta da palavra.',
+                paraQueServe: 'A gente usa para guardar nomes, frases, ou qualquer coisa que não seja para fazer cálculo matemático.',
+                analogia: 'É como você fazer o sinal de "aspas" com os dedos para dizer uma palavra. O computador vê as aspas e entende: "Ah, ele só quer que eu guarde esse texto, não é para fazer nenhuma conta com isso".',
+                codigo: `nome <span class="op">=</span> <span class="str">"Sandra"</span>\nprofissao <span class="op">=</span> <span class="str">"Professora"</span>`
+            },
+            {
+                id: 'boolean',
+                termo: 'Verdade/Mentira (bool)',
+                categoria: 'Tipos de Informação',
+                icone: '✅',
+                oQueE: 'É o tipo de informação mais simples do mundo. Só aceita duas opções: True (Verdadeiro) ou False (Falso).',
+                paraQueServe: 'Serve para o computador saber o status das coisas. O usuário pagou a conta? Sim ou Não. O jogo acabou? Sim ou Não.',
+                analogia: 'É um interruptor de lâmpada. Ou a luz está LIGADA ou está DESLIGADA. Não tem "meio ligada".',
+                codigo: `conta_paga <span class="op">=</span> <span class="kw">True</span>\naluno_reprovado <span class="op">=</span> <span class="kw">False</span>`
+            },
+            {
+                id: 'if-elif-else',
+                termo: 'Decisões (if/else)',
+                categoria: 'Decisões',
+                icone: '🚦',
+                oQueE: 'É o computador fazendo escolhas. O famoso: "Se acontecer isso, faço X. Senão, faço Y".',
+                paraQueServe: 'O código não roda sempre reto. Às vezes o aluno tirou 10 (passou), às vezes tirou 2 (reprovou). O IF serve pro computador reagir de forma diferente dependendo da situação.',
+                analogia: 'Se (IF) estiver chovendo, eu pego o guarda-chuva. Senão (ELSE), eu saio só de camiseta. Simples assim de entender.',
+                codigo: `chuva <span class="op">=</span> <span class="kw">True</span>\n\n<span class="kw">if</span> chuva <span class="op">==</span> <span class="kw">True</span>:\n    <span class="func">print</span>(<span class="str">"Pegue o guarda-chuva!"</span>)\n<span class="kw">else</span>:\n    <span class="func">print</span>(<span class="str">"Pode sair de óculos de sol!"</span>)`
+            },
+            {
+                id: 'for',
+                termo: 'Repetição com limite (for)',
+                categoria: 'Decisões',
+                icone: '🔄',
+                oQueE: 'É o computador fazendo trabalho braçal. Ele repete a mesma ação várias vezes, mas com hora marcada para parar.',
+                paraQueServe: 'Você usa quando JÁ SABE a quantidade exata de vezes que quer que ele faça algo.',
+                analogia: 'Entregar panfletos. Você tem 10 panfletos na mão. Você entrega um para a primeira pessoa, outro para a segunda... Você repete esse movimento ATÉ os panfletos da sua mão acabarem.',
+                codigo: `lista_de_tarefas <span class="op">=</span> [<span class="str">"Varrer"</span>, <span class="str">"Lavar louça"</span>, <span class="str">"Limpar vidro"</span>]\n\n<span class="cmt"># Ele vai fazer isso 3 vezes, uma pra cada tarefa da lista</span>\n<span class="kw">for</span> tarefa <span class="kw">in</span> lista_de_tarefas:\n    <span class="func">print</span>(<span class="str">f"Eu terminei de: {tarefa}"</span>)`
+            },
+            {
+                id: 'while',
+                termo: 'Repetição por teimosia (while)',
+                categoria: 'Decisões',
+                icone: '🔁',
+                oQueE: 'Significa "Enquanto". O computador fica preso repetindo a mesma coisa até que algo mude e ele consiga sair.',
+                paraQueServe: 'Você usa quando NÃO SABE a que horas o computador vai poder parar. Ele tem que ficar tentando e tentando.',
+                analogia: 'Tentar abrir uma porta trancada. ENQUANTO (while) a chave não for a certa, você não consegue entrar. Você tenta 1, 2, ou 100 vezes. Ele só te libera quando a chave correta for usada.',
+                codigo: `porta_aberta <span class="op">=</span> <span class="kw">False</span>\n\n<span class="cmt"># Fica perguntando a senha até acertar</span>\n<span class="kw">while</span> porta_aberta <span class="op">==</span> <span class="kw">False</span>:\n    senha <span class="op">=</span> <span class="func">input</span>(<span class="str">"Digite a senha: "</span>)\n    <span class="kw">if</span> senha <span class="op">==</span> <span class="str">"123"</span>:\n        porta_aberta <span class="op">=</span> <span class="kw">True</span>`
+            },
+            {
+                id: 'list',
+                termo: 'Lista de Coisas [ ]',
+                categoria: 'Organização',
+                icone: '📋',
+                oQueE: 'É uma fila onde você guarda várias informações juntas num lugar só. Elas ficam ordenadas: o 1º, o 2º, o 3º...',
+                paraQueServe: 'Para você não ter que criar mil variáveis (nome1, nome2, nome3). Você cria uma lista de compras só e joga tudo lá dentro.',
+                analogia: 'Exatamente igual à sua lista de compras de supermercado escrita no papel. Você coloca itens novos no final da lista, risca o que não quer, e sabe qual foi a primeira coisa que você anotou.',
+                codigo: `<span class="cmt"># Uma lista de compras entre colchetes [ ]</span>\ncompras <span class="op">=</span> [<span class="str">"Arroz"</span>, <span class="str">"Feijão"</span>, <span class="str">"Macarrão"</span>]\n\n<span class="cmt"># Pega o primeiro item (o computador sempre começa a contar do 0)</span>\n<span class="func">print</span>(compras[<span class="num">0</span>]) <span class="cmt"># Vai escrever "Arroz"</span>`
+            },
+            {
+                id: 'def',
+                termo: 'Criar Rotina (def)',
+                categoria: 'Organização',
+                icone: '⚙️',
+                oQueE: 'Você ensina um "truque novo" ou uma rotina para o computador. Você dá um nome para esse bloco de código.',
+                paraQueServe: 'Para não ficar repetindo código. Se o computador precisa calcular a nota do aluno todo dia, você empacota essa conta dentro de um "def" e só chama ela pelo nome quando precisar.',
+                analogia: 'É igual adestrar um cachorro. Você ensina a rotina de deitar e rolar e dá o nome de "Finge de Morto". Depois, é só você gritar "Finge de Morto" que ele repete a rotina toda sozinho. Você não precisa ensinar o passo a passo de novo.',
+                codigo: `<span class="cmt"># A gente ensina o comando e dá o nome de "latir"</span>\n<span class="kw">def</span> <span class="func">latir</span>():\n    <span class="func">print</span>(<span class="str">"Au au au!"</span>)\n\n<span class="cmt"># Agora é só mandar o cachorro fazer</span>\n<span class="func">latir</span>()`
+            },
+            {
+                id: 'select-from',
+                termo: 'SELECT * FROM',
+                categoria: 'Banco de Dados',
+                icone: '🗄️',
+                oQueE: 'É o comando para o computador ler a gaveta onde as coisas estão salvas de forma permanente.',
+                paraQueServe: 'O Python tem memória curta (se você fecha o programa, ele esquece tudo). O Banco de Dados (SQL) é o HD, o arquivo morto. O SELECT serve para você pedir os arquivos que estão lá.',
+                analogia: 'O asterisco (*) quer dizer TUDO. Então o "SELECT * FROM Clientes" é você gritando para a arquivista: "Vai na prateleira de Clientes e me traz TUDO que tem lá dentro!"',
+                codigo: `<span class="cmt"># Manda buscar todos (*) os dados da gaveta (tabela) de alunos</span>\ncursor.execute(<span class="str">"<span class="sql">SELECT</span> * <span class="sql">FROM</span> alunos"</span>)`
+            },
+            {
+                id: 'where',
+                termo: 'Filtro (WHERE)',
+                categoria: 'Banco de Dados',
+                icone: '🎯',
+                oQueE: 'É você colocando um limite no que o arquivo vai te devolver, para não trazer lixo desnecessário.',
+                paraQueServe: 'Se a sua empresa tem 1 milhão de clientes, pedir para ver TODOS vai travar o computador. O WHERE serve para você especificar quem você quer ver.',
+                analogia: 'É você dizendo ao estoquista: "Me mostre os sapatos, MAS SÓ (where) os sapatos que forem tamanho 40. Não me traga o resto."',
+                codigo: `<span class="cmt"># Traz os sapatos, ONDE o tamanho for 40</span>\ncursor.execute(<span class="str">"<span class="sql">SELECT</span> * <span class="sql">FROM</span> sapatos <span class="sql">WHERE</span> tamanho = 40"</span>)`
+            },
+            {
+                id: 'insert-into',
+                termo: 'Guardar (INSERT INTO)',
+                categoria: 'Banco de Dados',
+                icone: '📥',
+                oQueE: 'É você gravando, escrevendo e salvando uma nova informação de forma definitiva na gaveta.',
+                paraQueServe: 'Quando um aluno novo se matricula, você não pode só escrever na memória curta do Python. Você usa o INSERT para cadastrar ele no arquivo permanente.',
+                analogia: 'Pegar uma folha pautada em branco, escrever o nome do paciente com caneta, e guardar dentro da pasta verde no armário de aço.',
+                codigo: `<span class="cmt"># Insere (Guarda) o nome Maria na tabela de Alunos</span>\ncursor.execute(<span class="str">"<span class="sql">INSERT INTO</span> alunos (nome) <span class="sql">VALUES</span> ('Maria')"</span>)`
+            }
+        ];
+
+        // --- STATE & DOM ELEMENTS ---
+        const listContainer = document.getElementById('terms-list');
+        const contentDisplay = document.getElementById('content-display');
+        const searchInput = document.getElementById('search-input');
+        
+        let currentCategory = 'Todos';
+        let searchQuery = '';
+
+        // --- CATEGORY STYLING CONFIG ---
+        const getCategoryBadge = (category) => {
+            let className = '';
+            if (category === 'Comunicação') className = 'badge-io';
+            else if (category === 'Tipos de Informação') className = 'badge-types';
+            else if (category === 'Decisões') className = 'badge-control';
+            else if (category === 'Organização') className = 'badge-collections';
+            else if (category === 'Banco de Dados') className = 'badge-sql';
+            else className = 'bg-slate-200 text-slate-600';
+
+            return `<span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${className}">${category}</span>`;
+        };
+
+        // --- RENDER LIST ---
+        function renderList() {
+            listContainer.innerHTML = '';
+            
+            // Filter Data
+            const filteredData = dictionaryData.filter(item => {
+                const matchesSearch = item.termo.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      item.oQueE.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesCategory = currentCategory === 'Todos' || item.categoria === currentCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filteredData.length === 0) {
+                listContainer.innerHTML = `<div class="p-4 text-center text-slate-400 text-sm">Nenhum comando encontrado.</div>`;
+                return;
+            }
+
+            filteredData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `term-item p-4 border-b border-slate-100 cursor-pointer flex items-center gap-3`;
+                div.onclick = () => selectTerm(item);
+                
+                div.innerHTML = `
+                    <div class="text-2xl">${item.icone}</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="font-bold text-slate-800 code-font text-[15px]">${item.termo}</h3>
+                        </div>
+                        ${getCategoryBadge(item.categoria)}
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        // --- SELECT TERM ---
+        function selectTerm(item) {
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('mobile-overlay').classList.add('hidden');
+            }
+
+            document.querySelectorAll('.term-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            contentDisplay.innerHTML = `
+                <div class="fade-in bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-slate-200 mb-8 md:mb-0">
+                    
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="text-4xl p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-sm">${item.icone}</div>
+                        <div>
+                            ${getCategoryBadge(item.categoria)}
+                            <h2 class="text-3xl font-bold text-slate-800 code-font mt-1 tracking-tight">${item.termo}</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- O que é? -->
+                        <div>
+                            <h3 class="text-sm font-bold text-blue-500 uppercase tracking-wider mb-2 flex items-center gap-2"><span class="text-lg">❓</span> O que é isso?</h3>
+                            <p class="text-slate-700 text-lg leading-relaxed bg-blue-50 p-4 rounded-xl border-l-4 border-blue-400">${item.oQueE}</p>
+                        </div>
+
+                        <!-- Para que serve / Analogia -->
+                        <div>
+                            <h3 class="text-sm font-bold text-amber-500 uppercase tracking-wider mb-2 flex items-center gap-2"><span class="text-lg">💡</span> Traduzindo para o mundo real</h3>
+                            <div class="text-slate-700 text-md leading-relaxed bg-amber-50 p-4 rounded-xl border border-amber-200">
+                                <p class="mb-3"><strong>Para que serve:</strong> ${item.paraQueServe}</p>
+                                <p class="pt-3 border-t border-amber-200"><strong>Analogia óbvia:</strong> ${item.analogia}</p>
+                            </div>
+                        </div>
+
+                        <!-- Código de Exemplo -->
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Exemplo no Código</h3>
+                            <div class="bg-slate-900 rounded-xl overflow-hidden shadow-inner relative">
+                                <div class="bg-slate-800 px-4 py-2 flex items-center gap-2 border-b border-slate-700">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                                    <span class="text-slate-400 text-xs code-font ml-2">codigo_simples.py</span>
+                                </div>
+                                <pre class="p-5 code-font text-sm md:text-[14px] leading-relaxed text-slate-300 overflow-x-auto whitespace-pre-wrap">${item.codigo}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- FILTERING ---
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const btnText = btn.textContent;
+                
+                // Active state
+                if (btnText === category || (category === 'Banco de Dados' && btnText === 'Gavetas (SQL)') || (category === 'Tipos de Informação' && btnText === 'Informações')) {
+                    btn.classList.add('bg-slate-800', 'text-white');
+                    btn.classList.remove('bg-slate-100', 'text-slate-600');
+                } else {
+                    btn.classList.remove('bg-slate-800', 'text-white');
+                    btn.classList.add('bg-slate-100', 'text-slate-600');
+                }
+            });
+
+            renderList();
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderList();
+        });
+
+        // --- MOBILE MENU LOGIC ---
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobile-overlay');
+
+        mobileBtn.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        });
+
+        // --- INIT ---
+        renderList();
+    </script>
+</body>
+</html>

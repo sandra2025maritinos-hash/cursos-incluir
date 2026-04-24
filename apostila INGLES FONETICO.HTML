@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-book: Inglês Fonético e Neuroinclusivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4; /* emerald-50 base */
+            color: #334155;
+        }
+        
+        .book-page {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            padding: 3rem;
+            margin-bottom: 3rem;
+            border-top: 8px solid #3b82f6; /* blue-500 */
+        }
+        
+        .chapter-title {
+            color: #1e3a8a; /* blue-900 */
+            border-bottom: 3px solid #bfdbfe; /* blue-200 */
+            padding-bottom: 0.75rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+        }
+
+        .vocab-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr auto;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .vocab-row:hover {
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .vocab-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr auto;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #eff6ff; /* blue-50 */
+            border-radius: 0.75rem;
+            font-weight: 800;
+            color: #1e40af; /* blue-800 */
+            margin-bottom: 0.5rem;
+        }
+
+        .audio-btn {
+            background-color: #dbeafe;
+            color: #2563eb;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .audio-btn:hover {
+            background-color: #3b82f6;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .vocab-row, .vocab-header {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .audio-btn { align-self: flex-start; }
+            .book-page { padding: 1.5rem; }
+        }
+
+        @media print {
+            body { background-color: white; }
+            .book-page { box-shadow: none; border-top: none; padding: 0; margin-bottom: 2rem; page-break-inside: avoid; }
+            .audio-btn { display: none !important; }
+            .print-hide { display: none !important; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Capa do E-book -->
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-700 p-6 print-hide">
+        <div class="bg-white rounded-[3rem] shadow-2xl max-w-4xl w-full p-12 text-center transform transition duration-500 relative overflow-hidden">
+            <div class="absolute top-0 right-0 opacity-5 text-[15rem] -mt-10 -mr-10 pointer-events-none">
+                <i class="fa-solid fa-language"></i>
+            </div>
+            
+            <div class="mb-8 relative z-10">
+                <div class="w-24 h-24 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-5xl mx-auto shadow-inner">
+                    <i class="fa-solid fa-headphones"></i>
+                </div>
+            </div>
+            <h2 class="text-blue-500 font-black uppercase tracking-[0.3em] text-sm mb-4 relative z-10">Neuro Inclusão Apresenta</h2>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-gray-800 mb-6 tracking-tight relative z-10">Inglês Fonético<br>Para Todos</h1>
+            <p class="text-xl text-gray-600 mb-10 font-medium max-w-2xl mx-auto relative z-10">O guia definitivo para escutar, ler e falar sem pressão gramatical. O seu cérebro aprende melhor pelo som e pelo contexto!</p>
+            
+            <div class="bg-blue-50 border-2 border-blue-100 p-6 rounded-2xl max-w-lg mx-auto mb-10 relative z-10">
+                <p class="text-blue-800 font-bold mb-2"><i class="fa-solid fa-circle-info mr-2"></i> Como usar este E-book Interativo:</p>
+                <p class="text-sm text-gray-600 text-left mb-2"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> <strong>Lê-se:</strong> Mostra como a nossa boca reproduz o som.</p>
+                <p class="text-sm text-gray-600 text-left"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> <strong>Ouça:</strong> Clique no ícone <i class="fa-solid fa-volume-high text-blue-400 mx-1"></i> para ouvir a pronúncia correta em voz alta!</p>
+            </div>
+
+            <p class="text-gray-400 text-sm mt-8 font-bold uppercase tracking-widest relative z-10">Desça para começar a aprender <i class="fa-solid fa-chevron-down ml-1 animate-bounce"></i></p>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="max-w-5xl mx-auto px-4 py-12">
+
+        <!-- Introdução -->
+        <div class="text-center mb-16 book-page" style="border-top-color: #10b981;">
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-6"><i class="fa-solid fa-book-open text-emerald-500 mr-3"></i> O Segredo dos Poliglotas</h2>
+            <p class="text-lg text-gray-600 leading-relaxed mb-6">Sabia que <strong>1.000 palavras compõem cerca de 85%</strong> de tudo o que se fala em inglês diariamente? Não precisa de decorar dicionários. O segredo é aprender as palavras "ferramenta" que conectam ideias.</p>
+            <p class="text-lg text-gray-600 leading-relaxed">Neste material, tirámos a gramática complexa do caminho e colocámos o foco na <strong>FONÉTICA</strong>. Você vai aprender a reconhecer o som e a reproduzi-lo no seu tempo, sem julgamentos.</p>
+        </div>
+
+        <!-- CAPÍTULO 1: Pronomes -->
+        <div class="book-page">
+            <h2 class="text-3xl chapter-title"><i class="fa-solid fa-users mr-3 text-orange-500"></i> Capítulo 1: Quem somos? (Pronomes)</h2>
+            <p class="text-gray-600 mb-8 text-lg">Os pronomes são as fundações de qualquer conversa. Eles substituem os nomes para a fala ficar mais rápida.</p>
+
+            <div class="vocab-header hidden md:grid">
+                <div>Inglês</div>
+                <div>Português</div>
+                <div>Como se lê (Fonética)</div>
+                <div class="text-center print-hide">Ouvir</div>
+            </div>
+
+            <!-- Dados Injetados -->
+            <div id="vocab-pronouns" class="space-y-1"></div>
+
+            <div class="mt-10 bg-orange-50 border border-orange-100 rounded-2xl p-6">
+                <h4 class="font-bold text-orange-800 mb-4"><i class="fa-solid fa-quote-left mr-2"></i> Frases Úteis (Treine o ouvido):</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
+                        <div><p class="font-bold text-gray-800">I am here.</p><p class="text-sm text-gray-500">Eu estou aqui.</p><p class="text-xs text-orange-600 font-bold italic mt-1">"Ái ém rír"</p></div>
+                        <button onclick="playAudio('I am here.')" class="audio-btn print-hide"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
+                        <div><p class="font-bold text-gray-800">You are my friend.</p><p class="text-sm text-gray-500">Você é meu amigo.</p><p class="text-xs text-orange-600 font-bold italic mt-1">"Iú ár mái frend"</p></div>
+                        <button onclick="playAudio('You are my friend.')" class="audio-btn print-hide"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAPÍTULO 2: Ação (Verbos Principais) -->
+        <div class="book-page" style="border-top-color: #ef4444;">
+            <h2 class="text-3xl chapter-title" style="color: #7f1d1d; border-bottom-color: #fecaca;"><i class="fa-solid fa-person-running mr-3 text-red-500"></i> Capítulo 2: Ação! (Os Verbos de Ouro)</h2>
+            <p class="text-gray-600 mb-8 text-lg">Se dominar estes verbos, conseguirá expressar quase qualquer necessidade ou desejo. Eles são o motor do idioma!</p>
+
+            <div class="vocab-header hidden md:grid" style="background-color: #fef2f2; color: #991b1b;">
+                <div>Inglês</div>
+                <div>Português</div>
+                <div>Como se lê (Fonética)</div>
+                <div class="text-center print-hide">Ouvir</div>
+            </div>
+
+            <div id="vocab-verbs" class="space-y-1"></div>
+
+            <div class="mt-10 bg-red-50 border border-red-100 rounded-2xl p-6">
+                <h4 class="font-bold text-red-800 mb-4"><i class="fa-solid fa-quote-left mr-2"></i> Frases Úteis com Verbos:</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
+                        <div><p class="font-bold text-gray-800">I want water.</p><p class="text-sm text-gray-500">Eu quero água.</p><p class="text-xs text-red-600 font-bold italic mt-1">"Ái uânt uó-târ"</p></div>
+                        <button onclick="playAudio('I want water.')" class="audio-btn print-hide" style="color:#dc2626; background-color:#fee2e2;"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
+                        <div><p class="font-bold text-gray-800">Can you help me?</p><p class="text-sm text-gray-500">Pode me ajudar?</p><p class="text-xs text-red-600 font-bold italic mt-1">"Kén iú rélp mí?"</p></div>
+                        <button onclick="playAudio('Can you help me?')" class="audio-btn print-hide" style="color:#dc2626; background-color:#fee2e2;"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAPÍTULO 3: Adjetivos -->
+        <div class="book-page" style="border-top-color: #a855f7;">
+            <h2 class="text-3xl chapter-title" style="color: #4c1d95; border-bottom-color: #e9d5ff;"><i class="fa-solid fa-palette mr-3 text-purple-500"></i> Capítulo 3: Qualidades (Adjetivos)</h2>
+            <p class="text-gray-600 mb-8 text-lg">Em inglês, a qualidade (adjetivo) vem sempre ANTES da coisa (substantivo). Exemplo: <em>Good day</em> (Bom dia).</p>
+
+            <div class="vocab-header hidden md:grid" style="background-color: #faf5ff; color: #5b21b6;">
+                <div>Inglês</div>
+                <div>Português</div>
+                <div>Como se lê (Fonética)</div>
+                <div class="text-center print-hide">Ouvir</div>
+            </div>
+
+            <div id="vocab-adjectives" class="space-y-1"></div>
+        </div>
+
+        <!-- CAPÍTULO 4: Substantivos do Cotidiano -->
+        <div class="book-page" style="border-top-color: #10b981;">
+            <h2 class="text-3xl chapter-title" style="color: #064e3b; border-bottom-color: #a7f3d0;"><i class="fa-solid fa-cube mr-3 text-emerald-500"></i> Capítulo 4: O Mundo ao Redor (Substantivos)</h2>
+            <p class="text-gray-600 mb-8 text-lg">Estas são as "coisas". Junte os pronomes, verbos e qualidades com estas palavras e terá a fluência básica na ponta da língua!</p>
+
+            <div class="vocab-header hidden md:grid" style="background-color: #ecfdf5; color: #065f46;">
+                <div>Inglês</div>
+                <div>Português</div>
+                <div>Como se lê (Fonética)</div>
+                <div class="text-center print-hide">Ouvir</div>
+            </div>
+
+            <div id="vocab-nouns" class="space-y-1"></div>
+        </div>
+
+        <!-- CAPÍTULO 5: Diálogos Práticos -->
+        <div class="book-page" style="border-top-color: #f59e0b;">
+            <h2 class="text-3xl chapter-title" style="color: #78350f; border-bottom-color: #fde68a;"><i class="fa-solid fa-comments mr-3 text-amber-500"></i> Capítulo 5: Contextos e Sobrevivência</h2>
+            <p class="text-gray-600 mb-8 text-lg">Aprender por blocos de contexto ajuda o cérebro a memorizar, porque cria uma cena previsível. Ouça as conversas.</p>
+
+            <div class="space-y-8">
+                <!-- Airport -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
+                    <h3 class="text-2xl font-black text-gray-800 mb-6 border-b pb-2"><i class="fa-solid fa-plane text-blue-500 mr-2"></i> No Aeroporto (At the Airport)</h3>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-blue-500">
+                            <div><p class="font-bold text-lg">Where is my gate?</p><p class="text-gray-500">Onde é o meu portão de embarque?</p><p class="text-sm font-bold text-blue-600 italic">"Uér íz mái guêit?"</p></div>
+                            <button onclick="playAudio('Where is my gate?')" class="audio-btn print-hide"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-gray-400">
+                            <div><p class="font-bold text-lg">Passport and ticket, please.</p><p class="text-gray-500">Passaporte e bilhete, por favor.</p><p class="text-sm font-bold text-gray-600 italic">"Pás-port ênd tí-ket, plíiz."</p></div>
+                            <button onclick="playAudio('Passport and ticket, please.')" class="audio-btn print-hide"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restaurant -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
+                    <h3 class="text-2xl font-black text-gray-800 mb-6 border-b pb-2"><i class="fa-solid fa-utensils text-rose-500 mr-2"></i> No Restaurante (At the Restaurant)</h3>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-rose-500">
+                            <div><p class="font-bold text-lg">Table for two, please.</p><p class="text-gray-500">Mesa para dois, por favor.</p><p class="text-sm font-bold text-rose-600 italic">"Têi-bol fór tú, plíiz."</p></div>
+                            <button onclick="playAudio('Table for two, please.')" class="audio-btn print-hide" style="color:#e11d48; background-color:#ffe4e6;"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-gray-400">
+                            <div><p class="font-bold text-lg">The bill, please.</p><p class="text-gray-500">A conta, por favor.</p><p class="text-sm font-bold text-gray-600 italic">"Dhâ bíl, plíiz."</p></div>
+                            <button onclick="playAudio('The bill, please.')" class="audio-btn print-hide" style="color:#e11d48; background-color:#ffe4e6;"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center py-10 print-hide">
+            <button onclick="window.print()" class="bg-gray-800 text-white font-bold py-4 px-10 rounded-full shadow-xl hover:scale-105 transition-all text-lg">
+                <i class="fa-solid fa-file-pdf mr-2"></i> Imprimir E-book em PDF
+            </button>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE INJEÇÃO E ÁUDIO -->
+    <script>
+        // BANCO DE DADOS (Organizado para renderizar as tabelas dinamicamente)
+        const pronouns = [
+            { en: "I", pt: "Eu", comoLê: "ái" }, { en: "You", pt: "Você", comoLê: "iú" },
+            { en: "He", pt: "Ele", comoLê: "rí" }, { en: "She", pt: "Ela", comoLê: "xí" },
+            { en: "We", pt: "Nós", comoLê: "uí" }, { en: "They", pt: "Eles/Elas", comoLê: "dhêi" },
+            { en: "My", pt: "Meu/Minha", comoLê: "mái" }, { en: "Your", pt: "Seu/Sua", comoLê: "iór" },
+            { en: "This", pt: "Este/Esta", comoLê: "dhís" }, { en: "That", pt: "Aquele/Aquela", comoLê: "dhét" }
+        ];
+
+        const verbs = [
+            { en: "Be", pt: "Ser/Estar", comoLê: "bí" }, { en: "Have", pt: "Ter", comoLê: "rév" },
+            { en: "Do", pt: "Fazer", comoLê: "dú" }, { en: "Say", pt: "Dizer", comoLê: "sêi" },
+            { en: "Go", pt: "Ir", comoLê: "gôu" }, { en: "Get", pt: "Pegar/Conseguir", comoLê: "gét" },
+            { en: "Make", pt: "Criar/Fazer", comoLê: "mêik" }, { en: "Know", pt: "Saber", comoLê: "nôu" },
+            { en: "Think", pt: "Pensar", comoLê: "thínk" }, { en: "See", pt: "Ver", comoLê: "sí" },
+            { en: "Want", pt: "Querer", comoLê: "uânt" }, { en: "Use", pt: "Usar", comoLê: "iúz" },
+            { en: "Find", pt: "Encontrar", comoLê: "fáind" }, { en: "Give", pt: "Dar", comoLê: "guív" },
+            { en: "Tell", pt: "Contar", comoLê: "tél" }, { en: "Work", pt: "Trabalhar", comoLê: "uârk" },
+            { en: "Call", pt: "Ligar", comoLê: "kól" }, { en: "Try", pt: "Tentar", comoLê: "trái" },
+            { en: "Ask", pt: "Perguntar", comoLê: "ásk" }, { en: "Need", pt: "Precisar", comoLê: "níd" },
+            { en: "Leave", pt: "Sair", comoLê: "líiv" }, { en: "Help", pt: "Ajudar", comoLê: "rélp" }
+        ];
+
+        const adjectives = [
+            { en: "Good", pt: "Bom", comoLê: "gúd" }, { en: "Bad", pt: "Ruim", comoLê: "béd" },
+            { en: "New", pt: "Novo", comoLê: "niú" }, { en: "Old", pt: "Velho", comoLê: "ôuld" },
+            { en: "Big", pt: "Grande", comoLê: "bíg" }, { en: "Small", pt: "Pequeno", comoLê: "smól" },
+            { en: "Easy", pt: "Fácil", comoLê: "ízi" }, { en: "Hard", pt: "Difícil", comoLê: "rárd" },
+            { en: "Fast", pt: "Rápido", comoLê: "fést" }, { en: "Happy", pt: "Feliz", comoLê: "répi" },
+            { en: "Important", pt: "Importante", comoLê: "impórtânt" }, { en: "Same", pt: "Mesmo", comoLê: "sêim" },
+            { en: "Tired", pt: "Cansado", comoLê: "táird" }, { en: "Hungry", pt: "Com fome", comoLê: "rângri" },
+            { en: "Beautiful", pt: "Bonito", comoLê: "biútiful" }, { en: "Expensive", pt: "Caro", comoLê: "ikspénsiv" }
+        ];
+
+        const nouns = [
+            { en: "Time", pt: "Tempo", comoLê: "táim" }, { en: "Day", pt: "Dia", comoLê: "dêi" },
+            { en: "People", pt: "Pessoas", comoLê: "píipl" }, { en: "Friend", pt: "Amigo", comoLê: "frénd" },
+            { en: "Family", pt: "Família", comoLê: "fémili" }, { en: "Work", pt: "Trabalho", comoLê: "uârk" },
+            { en: "Money", pt: "Dinheiro", comoLê: "mâni" }, { en: "House", pt: "Casa", comoLê: "ráus" },
+            { en: "Water", pt: "Água", comoLê: "uórer" }, { en: "Food", pt: "Comida", comoLê: "fúd" },
+            { en: "Coffee", pt: "Café", comoLê: "cófi" }, { en: "Car", pt: "Carro", comoLê: "kár" },
+            { en: "School", pt: "Escola", comoLê: "skúl" }, { en: "Question", pt: "Pergunta", comoLê: "kuéstchân" },
+            { en: "Problem", pt: "Problema", comoLê: "próblem" }, { en: "Travel", pt: "Viagem", comoLê: "trével" }
+        ];
+
+        // Função para Renderizar Listas HTML Dinamicamente
+        function renderTable(list, containerId, colorTheme) {
+            const container = document.getElementById(containerId);
+            const html = list.map(item => `
+                <div class="vocab-row">
+                    <div class="font-black text-xl text-gray-800 flex items-center gap-2">
+                        ${item.en}
+                    </div>
+                    <div class="font-bold text-gray-500 uppercase text-xs tracking-wider">${item.pt}</div>
+                    <div class="font-bold italic" style="color: ${colorTheme};">"${item.comoLê}"</div>
+                    <div class="flex justify-end print-hide">
+                        <button onclick="playAudio('${item.en.replace(/'/g, "\\'")}')" class="audio-btn" style="color: ${colorTheme}; background-color: ${colorTheme}15;">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            container.innerHTML = html;
+        }
+
+        // Executar Renderizações
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTable(pronouns, 'vocab-pronouns', '#ea580c'); // Orange
+            renderTable(verbs, 'vocab-verbs', '#dc2626');       // Red
+            renderTable(adjectives, 'vocab-adjectives', '#7c3aed'); // Purple
+            renderTable(nouns, 'vocab-nouns', '#059669');       // Emerald
+        });
+
+        // Motor de Áudio Fonético (Speech Synthesis)
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Para fala anterior se houver
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; // Sotaque Americano Padrão
+                utterance.rate = 0.85;    // Velocidade ligeiramente reduzida para neuro-inclusão
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("O seu navegador não suporta a leitura em voz alta.");
+            }
+        }
+    </script>
+</body>
+</html>

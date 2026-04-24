@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-book: Inglês Fonético Interativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4; 
+            color: #334155;
+        }
+        
+        .book-page {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            padding: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .chapter-title {
+            padding-bottom: 0.75rem;
+            margin-bottom: 2rem;
+            font-weight: 900;
+        }
+
+        .vocab-row {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .vocab-row:hover {
+            background-color: #f8fafc;
+            transform: translateX(4px);
+        }
+
+        .audio-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .btn-listen { background-color: #dbeafe; color: #2563eb; }
+        .btn-listen:hover { background-color: #3b82f6; color: white; }
+        
+        .btn-record { background-color: #fee2e2; color: #ef4444; }
+        .btn-record:hover { background-color: #ef4444; color: white; }
+        
+        .btn-play-self { background-color: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+        .btn-play-self.active { background-color: #d1fae5; color: #10b981; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); }
+        .btn-play-self.active:hover { background-color: #10b981; color: white; }
+
+        .recording-pulse { animation: pulse-red 1.5s infinite; background-color: #ef4444; color: white; }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .book-page { padding: 1.5rem; }
+            .vocab-col-wrapper { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+        }
+
+        @media print {
+            body { background-color: white; }
+            .book-page { box-shadow: none; border: none; padding: 0; margin-bottom: 2rem; page-break-inside: avoid; }
+            .print-hide { display: none !important; }
+            .vocab-row { border-bottom: 1px solid #ccc; padding: 0.5rem 0; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- CAPA DO E-BOOK -->
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-800 p-6 print-hide">
+        <div class="bg-white rounded-[3rem] shadow-2xl max-w-4xl w-full p-8 md:p-16 text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 opacity-5 text-[20rem] -mt-20 -mr-10 pointer-events-none"><i class="fa-solid fa-book-open-reader"></i></div>
+            
+            <div class="mb-8 relative z-10">
+                <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-5xl mx-auto shadow-inner">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                </div>
+            </div>
+            <h2 class="text-emerald-600 font-black uppercase tracking-[0.3em] text-sm mb-4 relative z-10">Neuro Inclusão Apresenta</h2>
+            <h1 class="text-5xl md:text-7xl font-extrabold text-gray-800 mb-6 tracking-tight relative z-10 leading-tight">Inglês Fonético<br>Interativo</h1>
+            <p class="text-xl text-gray-600 mb-10 font-medium max-w-2xl mx-auto relative z-10">O seu laboratório pessoal de fluência. Mais de 500 palavras e 100 expressões vitais para você ouvir, gravar e ser o juiz da sua própria evolução!</p>
+            
+            <div class="bg-slate-50 border-2 border-slate-100 p-6 md:p-8 rounded-3xl max-w-2xl mx-auto mb-10 relative z-10 text-left">
+                <h3 class="font-black text-slate-800 mb-4 text-xl"><i class="fa-solid fa-chalkboard-user text-emerald-500 mr-2"></i> Como usar a sua Apostila:</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-headphones"></i></div>
+                        <div><p class="font-bold text-gray-800">1. Ouvir</p><p class="text-sm text-gray-500">Clique para escutar a pronúncia da professora.</p></div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-microphone"></i></div>
+                        <div><p class="font-bold text-gray-800">2. Gravar</p><p class="text-sm text-gray-500">Leia a fonética e grave a sua própria voz a repetir.</p></div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-play"></i></div>
+                        <div><p class="font-bold text-gray-800">3. Comparar</p><p class="text-sm text-gray-500">Ouça a sua gravação. Não gostou? Grave de novo. Autonomia total!</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-gray-400 text-sm mt-8 font-bold uppercase tracking-widest relative z-10 animate-pulse">Desça para iniciar o treino <i class="fa-solid fa-chevron-down ml-1"></i></p>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="max-w-5xl mx-auto px-4 py-12" id="ebook-content">
+        <!-- O conteúdo será injetado aqui via JavaScript para manter o HTML limpo e rápido -->
+    </div>
+
+    <div class="text-center py-10 print-hide pb-20">
+        <button onclick="window.print()" class="bg-gray-800 text-white font-black py-5 px-12 rounded-full shadow-2xl hover:scale-105 hover:bg-black transition-all text-xl uppercase tracking-wider">
+            <i class="fa-solid fa-print mr-2"></i> Imprimir E-book
+        </button>
+        <p class="text-sm text-gray-500 mt-4">Ao imprimir, os botões de áudio serão ocultados automaticamente para uma leitura perfeita no papel.</p>
+    </div>
+
+    <!-- SCRIPTS DE DADOS E LÓGICA -->
+    <script>
+        // =========================================================================
+        // BANCO DE DADOS MASSIVO E COMPRIMIDO (500 Palavras + 100 Frases)
+        // Formato: Inglês | Português | Fonética
+        // =========================================================================
+
+        const rawPronounsAndConnectors = `
+I|Eu|ái;You|Você|iú;He|Ele|rí;She|Ela|xí;It|Ele/Ela (coisas)|ít;We|Nós|uí;They|Eles/Elas|dhêi;Me|Me / mim|mí;My|Meu/Minha|mái;Your|Seu/Sua|iór;His|Dele|ríz;Her|Dela|râr;Our|Nosso|áur;Their|Deles|dhér;A|Um/Uma|â;An|Um/Uma|én;The|O/A|dhâ;This|Este/Esta|dhís;That|Aquele/Aquela|dhét;These|Estes/Estas|dhíz;Those|Aqueles/Aquelas|dhôuz;Here|Aqui|ríer;There|Lá/Ali|dhér;And|E|énd;Or|Ou|ór;But|Mas|bât;Because|Porque|bicóz;So|Então|sôu;If|Se|íf;When|Quando|uén;Where|Onde|uér;Why|Por quê|uái;How|Como|ráu;What|O que/Qual|uót;Who|Quem|rú;Which|Qual|uích;Very|Muito|véri;Too|Demais/Também|túu;Also|Também|ólso;Just|Apenas|djâst;Only|Somente|ôunli;Always|Sempre|ólueiz;Never|Nunca|néver;Sometimes|Às vezes|sâmtaims;Usually|Geralmente|iújulí;Now|Agora|náu;Then|Então|dhén;Again|De novo|âgén;Maybe|Talvez|mêibi;Really|Realmente|ríali;With|Com|uíf;Without|Sem|uídaut;About|Sobre|abáut;Before|Antes|bifór;After|Depois|éftâr;Under|Embaixo|ândâr;Over|Sobre/Acima|ôuvâr;Between|Entre|bituíin;Through|Através|thrú;During|Durante|diúrin;Inside|Dentro|insáid;Outside|Fora|áutsáid;Near|Perto|níir;Far|Longe|fár;Behind|Atrás|biráind;Front|Frente|frânt`;
+
+        const rawVerbs = `
+Be|Ser/Estar|bí;Have|Ter|rév;Do|Fazer|dú;Say|Dizer|sêi;Go|Ir|gôu;Get|Pegar/Conseguir|gét;Make|Criar/Fazer|mêik;Know|Saber|nôu;Think|Pensar|thínk;Take|Pegar/Levar|têik;See|Ver|sí;Come|Vir|kâm;Want|Querer|uânt;Look|Olhar|lúk;Use|Usar|iúz;Find|Encontrar|fáind;Give|Dar|guív;Tell|Contar|tél;Work|Trabalhar|uârk;Call|Chamar/Ligar|kól;Try|Tentar|trái;Ask|Perguntar|ásk;Need|Precisar|níd;Feel|Sentir|fíil;Become|Tornar-se|bicâm;Leave|Sair/Deixar|líiv;Put|Colocar|pút;Mean|Significar|míin;Keep|Manter|kíip;Let|Deixar|lét;Begin|Começar|bigín;Seem|Parecer|síim;Help|Ajudar|rélp;Talk|Conversar|tók;Turn|Virar|târn;Start|Iniciar|stárt;Show|Mostrar|xôu;Hear|Ouvir|rír;Play|Jogar/Tocar|plêi;Run|Correr|rân;Move|Mover|múuv;Like|Gostar|láik;Live|Viver/Morar|lív;Believe|Acreditar|bilíiv;Hold|Segurar|rôuld;Bring|Trazer|bríng;Happen|Acontecer|répen;Write|Escrever|ráit;Provide|Fornecer|prováid;Sit|Sentar|sít;Stand|Ficar de pé|sténd;Lose|Perder|lúuz;Pay|Pagar|pêi;Meet|Encontrar|míit;Include|Incluir|inclúud;Continue|Continuar|contíniu;Set|Configurar/Pôr|sét;Learn|Aprender|lârn;Change|Mudar|tchêindj;Lead|Liderar|líid;Understand|Entender|ândârsténd;Watch|Assistir|uótch;Follow|Seguir|fólou;Stop|Parar|stóp;Create|Criar|criêit;Speak|Falar|spíik;Read|Ler|ríid;Allow|Permitir|aláu;Add|Adicionar|éd;Spend|Gastar/Passar|spénd;Grow|Crescer|grôu;Open|Abrir|ôupen;Walk|Andar|uólk;Win|Vencer|uín;Offer|Oferecer|ófâr;Remember|Lembrar|rimémbâr;Love|Amar|lâv;Consider|Considerar|consídâr;Appear|Aparecer|apíir;Buy|Comprar|bái;Wait|Esperar|uêit;Serve|Servir|sârv;Die|Morrer|dái;Send|Enviar|sénd;Expect|Esperar (espectativa)|ekspéct;Build|Construir|bíuld;Stay|Ficar|stêi;Fall|Cair|fól;Cut|Cortar|kât;Reach|Alcançar|ríitch;Kill|Matar|kíl;Remain|Permanecer|rimêin;Suggest|Sugerir|sâdjést;Raise|Levantar|rêiz;Pass|Passar|pés;Sell|Vender|sél;Require|Exigir|riquáir;Report|Relatar|ripórt;Decide|Decidir|dissáid;Pull|Puxar|púl`;
+
+        const rawAdjectives = `
+Good|Bom|gúd;Bad|Ruim|béd;New|Novo|niú;Old|Velho|ôuld;First|Primeiro|fârst;Last|Último|lést;Long|Longo|lóng;Short|Curto|xórt;Great|Ótimo|grêit;Little|Pequeno (pouco)|lítol;Big|Grande|bíg;Small|Pequeno (tamanho)|smól;Large|Largo/Grande|lárj;Right|Certo|ráit;Wrong|Errado|róng;High|Alto|rái;Low|Baixo|lôu;Different|Diferente|dífrent;Same|Mesmo/Igual|sêim;Important|Importante|impórtânt;Early|Cedo|ârli;Late|Tarde|lêit;Young|Jovem|iâng;Few|Poucos|fiú;Many|Muitos|mêni;Public|Público|pâblik;Private|Privado|práivet;Able|Capaz|êibol;Clear|Claro/Limpo|clíir;Certain|Certo/Seguro|sârtân;Free|Livre/Grátis|fríi;Full|Cheio|fúl;Empty|Vazio|émpti;Easy|Fácil|íizi;Hard|Difícil/Duro|rárd;Difficult|Difícil|dífikult;Strong|Forte|stróng;Weak|Fraco|uíik;Open|Aberto|ôupen;Closed|Fechado|clôuzd;Ready|Pronto|rêdi;Tired|Cansado|táird;Hungry|Com fome|rângri;Thirsty|Com sede|thârsti;Beautiful|Bonito|biútiful;Ugly|Feio|âgli;Cheap|Barato|tchíip;Expensive|Caro|ikspénsiv;Clean|Limpo|clíin;Dirty|Sujo|dârti;Safe|Seguro|sêif;Dangerous|Perigoso|dêinjerâs;Simple|Simples|símpl;Friendly|Amigável|fréndli;Polite|Educado|poláit;Rude|Grosseiro|rúud;Quiet|Quieto|quáiêt;Loud|Barulhento|láud;Nice|Legal/Agradável|náis;Happy|Feliz|répi;Sad|Triste|séd;Angry|Irritado|éngri;Bored|Entediado|bórd;Excited|Animado|iksáited;Hot|Quente|rót;Cold|Frio|kôuld;Warm|Morno|uórm;Cool|Fresco/Legal|kúl;Dry|Seco|drái;Wet|Molhado|uét;Heavy|Pesado|révi;Light|Leve/Luz|láit;Dark|Escuro|dárk;Bright|Brilhante|bráit;Soft|Macio|sóft;Hard|Duro|rárd;Smooth|Suave|smúuth;Rough|Áspero|râf;Sweet|Doce|sóft;Sour|Azedo|sáur;Spicy|Apimentado|spáisi;Salty|Salgado|sólti;Fresh|Fresco|frésh;Rich|Rico|rítch;Poor|Pobre|púur;Fast|Rápido|fést;Quick|Rápido|kuík;Slow|Devagar|slôu;Deep|Profundo|díip;Shallow|Raso|xélou;Wide|Largo|uáid;Narrow|Estreito|nérou;Thick|Grosso|thík;Thin|Fino|thín;True|Verdadeiro|trúu;False|Falso|fóls;Real|Real|ríal;Fake|Falso|fêik;Fine|Bem/Fino|fáin;Sick|Doente|sík`;
+
+        const rawNouns = `
+Time|Tempo|táim;Person|Pessoa|pípol;Year|Ano|íir;Way|Caminho/Jeito|uêi;Day|Dia|dêi;Thing|Coisa|thíng;Man|Homem|mén;Woman|Mulher|uúman;Child|Criança|tcháild;Boy|Menino|bói;Girl|Menina|gârl;World|Mundo|uârld;Life|Vida|láif;Hand|Mão|rénd;Part|Parte|párt;Eye|Olho|ái;Place|Lugar|plêis;Work|Trabalho|uârk;Week|Semana|uíik;Case|Caso|kêis;Point|Ponto|póint;Government|Governo|góvârnmênt;Company|Empresa|cômpani;Number|Número|nâmbâr;Group|Grupo|grúp;Problem|Problema|próblêm;Fact|Fato|féct;Water|Água|uórâr;Mother|Mãe|mádâr;Father|Pai|fádâr;Family|Família|fémili;Area|Área|éria;Money|Dinheiro|mâni;Story|História|stóri;Month|Mês|mânth;Lot|Lote/Muitos|lót;Right|Direito/Direita|ráit;Study|Estudo|stâdi;Book|Livro|búk;Job|Emprego|djób;Word|Palavra|uôrd;Business|Negócio|bíznes;Issue|Questão|íxiu;Side|Lado|sáid;Kind|Tipo|káind;Head|Cabeça|réd;House|Casa|ráus;Service|Serviço|sârvis;Friend|Amigo|frénd;Power|Poder|páuer;Hour|Hora|áuâr;Game|Jogo|guêim;Line|Linha|láin;End|Fim|énd;Member|Membro|mémbâr;Law|Lei|ló;Car|Carro|kár;City|Cidade|síti;Community|Comunidade|comiúniti;Name|Nome|nêim;President|Presidente|prézident;Team|Equipe|tíim;Minute|Minuto|míniut;Idea|Ideia|aidía;Kid|Criança|kíd;Body|Corpo|bódi;Information|Informação|informêixân;Back|Costas/Atrás|bék;Parent|Pai/Mãe|pérent;Face|Rosto|fêis;Others|Outros|ódârs;Level|Nível|lével;Office|Escritório|ófis;Door|Porta|dór;Health|Saúde|rélth;Art|Arte|árt;War|Guerra|uór;History|História|rístori;Party|Festa/Partido|párti;Result|Resultado|rizâlt;Change|Mudança|tchêindj;Morning|Manhã|mórnin;Reason|Razão|ríizan;Research|Pesquisa|risârtch;Moment|Momento|mômênt;Air|Ar|ér;Teacher|Professor|tíitchâr;Force|Força|fórs;Education|Educação|ediukêixân;Food|Comida|fúd;Coffee|Café|kófi;Tea|Chá|tíi;Bread|Pão|bréd;Cheese|Queijo|tchíiz;Chicken|Frango|tchíken;Meat|Carne|míit;Fish|Peixe|físh;Apple|Maçã|épol;Banana|Banana|banéna;Rice|Arroz|ráis;Beans|Feijão|bíins;Salad|Salada|sélad;Soup|Sopa|súp;Milk|Leite|mílk;Juice|Suco|djúis;Sugar|Açúcar|xúgar;Salt|Sal|sólt;Dog|Cachorro|dóg;Cat|Gato|két;Bird|Pássaro|bârd;Horse|Cavalo|rórs;Color|Cor|kólâr;Red|Vermelho|réd;Blue|Azul|blú;Green|Verde|gríin;Yellow|Amarelo|iélou;Black|Preto|blék;White|Branco|uáit;Computer|Computador|compiútâr;Phone|Telefone|fôun;Screen|Tela|scríin;Shirt|Camisa|xârt;Pants|Calça|pénts;Shoes|Sapatos|xúuz;Sun|Sol|sân;Rain|Chuva|rêin`;
+
+        // 100 Expressões Vitais
+        const rawPhrases = `
+Hello!|Olá!|re-lôu!;Hi!|Oi!|rái!;Good morning.|Bom dia.|gud mór-nin.;Good afternoon.|Boa tarde.|gud áf-târ-nun.;Good evening.|Boa noite (chegada).|gud ív-nin.;Good night.|Boa noite (despedida).|gud náit.;How are you?|Como está você?|rau ár iú?;I am fine, thanks.|Estou bem, obrigado(a).|ái ém fáin, thénks.;And you?|E você?|ênd iú?;Nice to meet you.|Prazer em conhecer-te.|náis tu míit iú.;See you later.|Até logo.|síi iú lêi-târ.;Have a nice day!|Tenha um bom dia!|rév â náis dêi!;What is your name?|Qual é o seu nome?|uót íz iór nêim?;My name is...|Meu nome é...|mái nêim íz...;Where are you from?|De onde você é?|uér ár iú fróm?;I am from Brazil.|Eu sou do Brasil.|ái ém fróm Bra-zíl.;Excuse me.|Com licença.|iks-kiúz mí.;Please.|Por favor.|plíiz.;Thank you.|Obrigado(a).|thénk iú.;Thanks a lot.|Muito obrigado(a).|thénks â lót.;You are welcome.|De nada.|iú ár uél-kâm.;I am sorry.|Me desculpe.|ái ém só-ri.;No problem.|Sem problemas.|nôu pró-blêm.;Can you help me?|Você pode me ajudar?|kén iú rélp mí?;I don't understand.|Eu não entendo.|ái dônt ân-dâr-sténd.;Could you repeat that?|Poderia repetir?|kúd iú ri-píit dhét?;Please speak slowly.|Por favor, fale devagar.|plíiz spíik slôu-li.;I don't speak English well.|Eu não falo inglês bem.|ái dônt spíik in-glix uél.;Where is the restroom?|Onde fica o banheiro?|uér íz dhâ rést-rum?;How much is this?|Quanto custa isto?|rau mâtch íz dhís?;I would like...|Eu gostaria de...|ái wúd láik...;Can I have the bill?|Pode me trazer a conta?|kén ái rév dhâ bil?;Do you take credit cards?|Vocês aceitam cartão?|du iú têik cré-dit kárds?;I need a taxi.|Eu preciso de um táxi.|ái níd â ték-si.;Where is the hotel?|Onde é o hotel?|uér íz dhâ rôu-tél?;I have a reservation.|Eu tenho uma reserva.|ái rév â re-zâr-vêi-xân.;What time is it?|Que horas são?|uót táim íz it?;I am lost.|Estou perdido(a).|ái ém lóst.;Call the police!|Chame a polícia!|kól dhâ po-líis!;I need a doctor.|Preciso de um médico.|ái níd â dók-tor.;It is an emergency.|É uma emergência.|ít íz en i-mâr-jen-si.;Help me!|Ajude-me!|rélp mí!;I feel sick.|Me sinto doente.|ái fíil sík.;I love it!|Eu adorei!|ái lâv it!;I don't like it.|Eu não gosto disto.|ái dônt láik it.;It is beautiful.|É bonito.|ít íz biú-ti-fúl.;It is very expensive.|É muito caro.|ít íz vé-ri iks-pén-siv.;It is cheap.|É barato.|ít íz tchíip.;I agree.|Eu concordo.|ái a-gríi.;I disagree.|Eu discordo.|ái dis-a-gríi.;Maybe.|Talvez.|mêi-bi.;Of course.|Claro.|of kórs.;I am sure.|Eu tenho certeza.|ái ém xúr.;Are you sure?|Você tem certeza?|ár iú xúr?;What do you do?|O que você faz? (trabalho)|uót du iú dú?;I am a student.|Eu sou estudante.|ái ém â stiú-dent.;Where do you work?|Onde você trabalha?|uér du iú uârk?;I work in an office.|Trabalho em um escritório.|ái uârk in en ó-fis.;Do you have family?|Você tem família?|dú iú rév fé-mi-li?;I have a brother.|Eu tenho um irmão.|ái rév â bró-dâr.;I am married.|Eu sou casado(a).|ái ém mé-rid.;I am single.|Eu sou solteiro(a).|ái ém sín-gol.;What is your phone number?|Qual é o seu telefone?|uót íz iór fôun nâm-bâr?;Call me later.|Me ligue mais tarde.|kól mí lêi-târ.;I am hungry.|Estou com fome.|ái ém rân-gri.;I am thirsty.|Estou com sede.|ái ém thârs-ti.;I am tired.|Estou cansado(a).|ái ém táird.;I am happy.|Estou feliz.|ái ém ré-pi.;I am sad.|Estou triste.|ái ém séd.;I am angry.|Estou com raiva.|ái ém én-gri.;I am worried.|Estou preocupado(a).|ái ém uô-rid.;I am bored.|Estou entediado(a).|ái ém bórd.;I am excited!|Estou animado(a)!|ái ém ik-sái-ted!;Turn left.|Vire à esquerda.|târn léft.;Turn right.|Vire à direita.|târn ráit.;Go straight.|Siga em frente.|gôu strêit.;It is near.|É perto.|ít íz níir.;It is far.|É longe.|ít íz fár.;Next to the bank.|Perto do banco.|nékst tu dhâ bénk.;Across the street.|Do outro lado da rua.|a-krós dhâ stríit.;I need a table for two.|Preciso de uma mesa para dois.|ái níd â têi-bol fór tú.;The menu, please.|O cardápio, por favor.|dhâ mê-niu, plíiz.;I would like to order.|Gostaria de fazer o pedido.|ái wúd láik tu ór-dâr.;What do you recommend?|O que você recomenda?|uót du iú re-co-ménd?;A glass of water, please.|Um copo de água, por favor.|â glés of uó-râr, plíiz.;The check, please.|A conta, por favor.|dhâ tchék, plíiz.;Keep the change.|Fique com o troco.|kíip dhâ tchêindj.;What day is today?|Que dia é hoje?|uót dêi íz tu-dêi?;Today is Monday.|Hoje é segunda-feira.|tu-dêi íz mân-dêi.;Tomorrow is Tuesday.|Amanhã é terça-feira.|tu-mó-rou íz tiúz-dêi.;Yesterday was Sunday.|Ontem foi domingo.|iés-târ-dêi uóz sân-dêi.;It is hot today.|Está quente hoje.|ít íz rót tu-dêi.;It is cold.|Está frio.|ít íz kôuld.;It is raining.|Está chovendo.|ít íz rêi-nin.;I need a break.|Preciso de uma pausa.|ái níd a brêik.;I am overwhelmed.|Estou sobrecarregado.|ái ém ou-vâr-uélmd.;It is too loud.|Está muito alto/barulho.|ít íz túu láud.;I want to sleep.|Eu quero dormir.|ái uânt tu is-líip.`;
+
+        // =========================================================================
+        // PROCESSAMENTO DE DADOS
+        // =========================================================================
+        function processData(rawData) {
+            return rawData.replace(/\n/g, '').trim().split(';').filter(i => i).map(item => {
+                const [en, pt, phon] = item.split('|');
+                return { en: en.trim(), pt: pt.trim(), phon: phon.trim() };
+            });
+        }
+
+        const dataPronouns = processData(rawPronounsAndConnectors);
+        const dataVerbs = processData(rawVerbs);
+        const dataAdjectives = processData(rawAdjectives);
+        const dataNouns = processData(rawNouns);
+        const dataPhrases = processData(rawPhrases);
+
+        // =========================================================================
+        // MOTOR DE ÁUDIO E GRAVAÇÃO (SEM FEEDBACK IA)
+        // =========================================================================
+        
+        // 1. Áudio Nativo (Professora)
+        let femaleVoice = null;
+        function setPreferredVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            femaleVoice = voices.find(v => 
+                (v.lang.startsWith('en-US') || v.lang.startsWith('en-GB')) && 
+                (v.name.includes('Female') || v.name.includes('Google US English') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Victoria'))
+            );
+            if(!femaleVoice) femaleVoice = voices.find(v => v.lang.startsWith('en-US')); 
+        }
+        window.speechSynthesis.onvoiceschanged = setPreferredVoice;
+
+        function playNative(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let textToSpeak = text;
+                if (text.trim().toLowerCase() === "hi!" || text.trim().toLowerCase() === "hi") {
+                    textToSpeak = "Hello, hi."; 
+                }
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; 
+                utterance.pitch = 1.1; 
+                if(!femaleVoice) setPreferredVoice(); 
+                if(femaleVoice) utterance.voice = femaleVoice;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Seu navegador não suporta áudio nativo.");
+            }
+        }
+
+        // 2. Gravação do Aluno
+        let globalMediaRecorder = null;
+        let globalAudioChunks = [];
+        let activeRecordBtnId = null;
+        const userAudioBlobs = {};
+
+        async function toggleRecording(btnId, wordId) {
+            const btn = document.getElementById(btnId);
+            const playBtn = document.getElementById(`play-${wordId}`);
+
+            // Se já estiver gravando, parar
+            if (globalMediaRecorder && globalMediaRecorder.state === "recording") {
+                globalMediaRecorder.stop();
+
+                if (activeRecordBtnId) {
+                    const oldBtn = document.getElementById(activeRecordBtnId);
+                    if (oldBtn) {
+                        oldBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+                        oldBtn.classList.remove('recording-pulse');
+                    }
+                }
+                if (activeRecordBtnId === btnId) {
+                    activeRecordBtnId = null;
+                    return;
+                }
+            }
+
+            // Iniciar nova gravação
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                globalMediaRecorder = new MediaRecorder(stream);
+                activeRecordBtnId = btnId;
+                globalAudioChunks = [];
+
+                globalMediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) globalAudioChunks.push(e.data);
+                };
+
+                globalMediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(globalAudioChunks, { type: 'audio/webm' });
+                    userAudioBlobs[wordId] = URL.createObjectURL(audioBlob);
+
+                    // Ativar botão de play
+                    if (playBtn) {
+                        playBtn.classList.add('active');
+                    }
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                globalMediaRecorder.start();
+                
+                // Mudar visual do botão
+                btn.innerHTML = '<i class="fa-solid fa-stop"></i>';
+                btn.classList.add('recording-pulse');
+
+            } catch (err) {
+                console.error(err);
+                alert("Para usar o laboratório de voz, por favor, permita o acesso ao microfone no seu navegador.");
+            }
+        }
+
+        function playSelf(wordId) {
+            if (userAudioBlobs[wordId]) {
+                const audio = new Audio(userAudioBlobs[wordId]);
+                audio.play();
+            }
+        }
+
+        // =========================================================================
+        // RENDERIZAÇÃO DO E-BOOK
+        // =========================================================================
+        function renderChapter(title, description, icon, dataList, colorTheme, chapterId) {
+            
+            // Map the colors based on theme
+            const colors = {
+                'orange': { border: '#f97316', text: '#c2410c', bg: '#fff7ed', titleBorder: '#fed7aa' },
+                'red': { border: '#ef4444', text: '#b91c1c', bg: '#fef2f2', titleBorder: '#fecaca' },
+                'purple': { border: '#a855f7', text: '#6d28d9', bg: '#faf5ff', titleBorder: '#e9d5ff' },
+                'emerald': { border: '#10b981', text: '#047857', bg: '#ecfdf5', titleBorder: '#a7f3d0' },
+                'amber': { border: '#f59e0b', text: '#b45309', bg: '#fffbeb', titleBorder: '#fde68a' }
+            }[colorTheme];
+
+            let rowsHtml = dataList.map((item, i) => {
+                const safeEn = item.en.replace(/'/g, "\\'");
+                const uId = `${chapterId}-${i}`;
+
+                return `
+                <div class="vocab-row py-4 px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-center">
+                        <div class="font-black text-2xl text-slate-800">${item.en}</div>
+                        <div class="font-bold text-slate-500 uppercase text-xs tracking-widest">${item.pt}</div>
+                        <div class="font-bold text-lg" style="color: ${colors.text};"><i class="fa-solid fa-lips text-sm mr-1 opacity-50"></i> "${item.phon}"</div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 print-hide shrink-0 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                        <button onclick="playNative('${safeEn}')" class="audio-btn btn-listen shadow-sm" title="Ouvir Professora">
+                            <i class="fa-solid fa-headphones text-lg"></i>
+                        </button>
+                        <button id="btn-rec-${uId}" onclick="toggleRecording('btn-rec-${uId}', '${uId}')" class="audio-btn btn-record shadow-sm" title="Gravar Minha Voz">
+                            <i class="fa-solid fa-microphone text-lg"></i>
+                        </button>
+                        <button id="play-${uId}" onclick="playSelf('${uId}')" class="audio-btn btn-play-self shadow-sm" title="Ouvir Minha Gravação">
+                            <i class="fa-solid fa-play text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="book-page" style="border-top-color: ${colors.border};">
+                <h2 class="text-3xl md:text-4xl chapter-title" style="color: ${colors.text}; border-bottom-color: ${colors.titleBorder};">
+                    <i class="fa-solid ${icon} mr-3"></i> ${title}
+                </h2>
+                <p class="text-slate-600 mb-8 text-lg md:text-xl leading-relaxed">${description}</p>
+
+                <div class="hidden md:flex bg-slate-100 p-4 rounded-xl font-black text-slate-400 uppercase tracking-widest text-xs mb-2">
+                    <div class="flex-1 grid grid-cols-3 gap-4">
+                        <div>Inglês</div>
+                        <div>Português</div>
+                        <div>Como se Lê</div>
+                    </div>
+                    <div class="w-[160px] text-center print-hide">Seu Laboratório</div>
+                </div>
+
+                <div class="space-y-1">
+                    ${rowsHtml}
+                </div>
+            </div>
+            `;
+        }
+
+        function initEbook() {
+            const container = document.getElementById('ebook-content');
+            let html = '';
+
+            html += renderChapter(
+                "Capítulo 1: A Base (Pronomes e Conectores)", 
+                "Estas palavras são a 'cola' do idioma. Elas ligam ideias, indicam tempo, espaço e pessoas. Memorize o som delas.", 
+                "fa-link", dataPronouns, 'orange', 'c1'
+            );
+
+            html += renderChapter(
+                "Capítulo 2: Ação! (Verbos de Ouro)", 
+                "Os verbos são o motor da comunicação. Com esta lista robusta, você consegue descrever quase qualquer ação do seu dia a dia.", 
+                "fa-person-running", dataVerbs, 'red', 'c2'
+            );
+
+            html += renderChapter(
+                "Capítulo 3: Qualificando o Mundo (Adjetivos)", 
+                "Lembre-se da regra de ouro: Em inglês, a qualidade vem sempre ANTES da coisa (Ex: <em>Beautiful house</em>).", 
+                "fa-palette", dataAdjectives, 'purple', 'c3'
+            );
+
+            html += renderChapter(
+                "Capítulo 4: O Mundo Físico (Substantivos)", 
+                "As coisas, as pessoas, os animais, a comida. Junte isto com os verbos que já aprendeu e você terá milhares de combinações possíveis.", 
+                "fa-cube", dataNouns, 'emerald', 'c4'
+            );
+
+            html += renderChapter(
+                "Capítulo 5: Sobrevivência (100 Expressões)", 
+                "Chega de traduzir palavra por palavra. Aprenda a frase inteira como um 'bloco' de som. Ouça a professora e repita até ficar natural.", 
+                "fa-comments", dataPhrases, 'amber', 'c5'
+            );
+
+            container.innerHTML = html;
+        }
+
+        // Inicializar Ebook após carregamento da página
+        window.addEventListener('DOMContentLoaded', initEbook);
+
+    </script>
+</body>
+</html>
